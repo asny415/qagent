@@ -60,16 +60,48 @@ const createWindow = () => {
   // rightView.webContents.openDevTools();
 };
 
+// Function to capture the right view and return base64
+const captureRightView = async (): Promise<string | null> => {
+  if (!rightView || !mainWindow) {
+    console.error("rightView or mainWindow is not available.");
+    return null;
+  }
+  try {
+    const bounds = rightView.getBounds();
+    const rect = {
+      x: 0,
+      y: 0,
+      width: bounds.width,
+      height: bounds.height,
+    };
+    console.log("need capture page", rect);
+
+    const image = await rightView.webContents.capturePage(rect);
+
+    return image.toDataURL();
+  } catch (error) {
+    console.error("Error capturing right view:", error);
+    return null;
+  }
+};
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
   createWindow();
+
   // Listen for the 'change-url' event from the renderer process
-  ipcMain.on("change-url", (event, url) => {
+  ipcMain.handle("change-url", (event, url) => {
     if (rightView) {
       rightView.webContents.loadURL(url);
     }
+  });
+
+  // Listen for the 'capture-right-view' event from the renderer process
+  ipcMain.handle("capture-right-view", async () => {
+    console.log("*** debug, need capture right view");
+    return await captureRightView();
   });
 });
 

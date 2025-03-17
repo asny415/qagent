@@ -7,9 +7,11 @@ import { contextBridge, ipcRenderer } from "electron";
 contextBridge.exposeInMainWorld("myAPI", {
   send: (channel: string, data: unknown) => {
     // whitelist channels
-    const validChannels = ["change-url"];
+    const validChannels = ["change-url", "capture-right-view"];
     if (validChannels.includes(channel)) {
-      ipcRenderer.send(channel, data);
+      return ipcRenderer.invoke(channel, data);
+    } else {
+      console.log("invalid channel", channel);
     }
   },
 });
