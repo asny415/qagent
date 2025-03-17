@@ -8,12 +8,15 @@ if (require("electron-squirrel-startup")) {
 
 let rightView: BrowserView | null = null; // Store rightView in a variable accessible within the module
 let mainWindow: BrowserWindow | null = null; // Store mainWindow in a variable accessible within the module
+const LEFT_VIEW_WIDTH_RATIO = 0.5; // Define the ratio of left view's width. Adjust as needed (e.g., 0.5 for 50%)
+const MIN_LEFT_VIEW_WIDTH = 300; // Set a minimum width for the left view to prevent it from becoming too small.
 
 const createWindow = () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1200, // Increased width to accommodate two views
     height: 600,
+    minWidth: MIN_LEFT_VIEW_WIDTH * 2, // Ensure window cannot be smaller than two times minimum view
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       // contextIsolation:false, //disable it for test
@@ -44,22 +47,44 @@ const createWindow = () => {
 
   // Set the bounds of the right-side view (half of the window width)
   const { width, height } = mainWindow.getBounds();
-  rightView.setBounds({ x: width / 2, y: 0, width: width / 2, height });
-  // Load a default URL in the right-side view
-  rightView.webContents.loadURL("https://www.google.com");
+  setViewsBounds(width, height);
 
   // Handle window resize to adjust view bounds
   mainWindow.on("resize", () => {
-    if (!rightView) return;
+    if (!rightView || !mainWindow) return;
     const { width, height } = mainWindow.getBounds();
-    rightView.setBounds({ x: width / 2, y: 0, width: width / 2, height });
+    setViewsBounds(width, height);
   });
   // Open the DevTools for main window in the bottom.
   mainWindow.webContents.openDevTools({ mode: "bottom" });
 
   // rightView.webContents.openDevTools();
 };
+function setViewsBounds(windowWidth: number, windowHeight: number) {
+  if (!mainWindow || !rightView) {
+    return;
+  }
+  const leftViewWidth = Math.max(
+    MIN_LEFT_VIEW_WIDTH,
+    windowWidth * LEFT_VIEW_WIDTH_RATIO
+  );
 
+  mainWindow.setBrowserView(null);
+  const bounds = { x: 0, y: 0, width: leftViewWidth, height: windowHeight };
+  mainWindow.setBrowserView(rightView);
+
+  mainWindow.getContentBounds();
+  rightView.setBounds({
+    x: leftViewWidth,
+    y: 0,
+    width: windowWidth - leftViewWidth,
+    height: windowHeight,
+  });
+  //getBrowserView bounds is undefined.
+  // console.log("leftView bounds", leftView.getBounds())
+
+  mainWindow.webContents.send("set-left-view-bounds", bounds);
+}
 // Function to capture the right view and return base64
 const captureRightView = async (): Promise<string | null> => {
   if (!rightView || !mainWindow) {

@@ -14,4 +14,7 @@ contextBridge.exposeInMainWorld("myAPI", {
       console.log("invalid channel", channel);
     }
   },
+  on: (channel: string, cb: () => void) => {
+    ipcRenderer.on(channel, (event, ...args) => cb(event, ...args));
+  },
 });
