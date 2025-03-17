@@ -1,4 +1,10 @@
-import { app, BrowserWindow, BrowserView, ipcMain } from "electron";
+import {
+  app,
+  BrowserWindow,
+  BrowserView,
+  ipcMain,
+  WebContents,
+} from "electron";
 import path from "path";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -44,6 +50,10 @@ const createWindow = () => {
     },
   });
   mainWindow.addBrowserView(rightView);
+  // rightView.webContents.loadURL("https://twitter.com/elonmusk");
+
+  // Monitor the dom-ready event for rightView
+  monitorRightViewDomReady(rightView.webContents);
 
   setTimeout(() => {
     // Set the bounds of the right-side view (half of the window width)
@@ -58,10 +68,11 @@ const createWindow = () => {
     setViewsBounds(width, height);
   });
   // Open the DevTools for main window in the bottom.
-  mainWindow.webContents.openDevTools({ mode: "bottom" });
+  // mainWindow.webContents.openDevTools({ mode: "bottom" });
 
-  // rightView.webContents.openDevTools();
+  // rightView.webContents.openDevTools({ mode: "bottom" });
 };
+
 function setViewsBounds(windowWidth: number, windowHeight: number) {
   if (!mainWindow || !rightView) {
     return;
@@ -112,17 +123,51 @@ const captureRightView = async (): Promise<string | null> => {
   }
 };
 
+// Function to monitor dom-ready event
+function monitorRightViewDomReady(webContents: WebContents) {
+  webContents.on("dom-ready", () => {
+    console.log("rightView DOM is ready!");
+    if (rightViewDomReadyResolve) {
+      rightViewDomReadyResolve();
+      rightViewDomReadyResolve = null;
+    }
+  });
+}
+
+let rightViewDomReadyResolve: () => void | null = null;
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
   createWindow();
 
+  ipcMain.handle("next-page", async () => {
+    if (rightView) {
+      console.log("next-page called");
+      const bounds = rightView.getBounds();
+      setTimeout(() => {
+        rightView.webContents.sendInputEvent({
+          type: "mouseWheel",
+          x: bounds.width / 2, // 触发滚动的 X 坐标（屏幕中的某处）
+          y: bounds.height / 2, // 触发滚动的 Y 坐标
+          deltaX: 0, // 不左右滚动
+          deltaY: -bounds.height * 0.7, // 负值代表向上滚动，数值控制滚动距离
+          canScroll: true,
+        });
+      }, 1000);
+    } else {
+      console.error("rightView is not available.");
+    }
+  });
+
   // Listen for the 'change-url' event from the renderer process
   ipcMain.handle("change-url", (event, url) => {
     if (rightView) {
       console.log(`right view should load url ${url}`);
-      rightView.webContents.loadURL(url);
+      return new Promise((r) => {
+        rightViewDomReadyResolve = r;
+        rightView.webContents.loadURL(url);
+      });
     } else {
       console.error("rightView is not available.");
     }

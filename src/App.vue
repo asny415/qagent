@@ -31,6 +31,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
 import { AIAgent } from './QAgent'
+import { pageDown } from "./ElectronWindow.ts"
 interface Message {
     id: number;
     sender: 'user' | 'other';
