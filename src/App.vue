@@ -8,14 +8,14 @@
                 :class="['message', message.sender === 'user' ? 'sent' : 'received']">
                 <div class="message-content">
                     <span class="message-sender">{{ message.senderName }}:</span>
-                    <p class="message-text">{{ message.text }}</p>
+                    <p class="message-text" v-html="renderMarkdown(message.text)"></p>
                 </div>
                 <span class="message-time">{{ message.timestamp }}</span>
             </div>
             <div :class="['message', 'received']" v-if="newAgegntMessage">
                 <div class="message-content">
                     <span class="message-sender">{{ newAgegntMessage.senderName }}:</span>
-                    <p class="message-text">{{ newAgegntMessage.text }}</p>
+                    <p class="message-text" v-html="renderMarkdown(newAgegntMessage.text)"></p>
                 </div>
                 <span class="message-time">{{ newAgegntMessage.timestamp }}</span>
             </div>
@@ -30,6 +30,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
+import MarkdownIt from 'markdown-it';
 import { AIAgent } from './QAgent'
 import { pageDown } from "./ElectronWindow.ts"
 interface Message {
@@ -47,7 +48,10 @@ const newMessage = ref('埃隆马斯克最近都发了哪些推特');
 const newAgegntMessage = ref<Message>(null);
 const nextMessageId = ref(7);
 const chatHistory = ref<HTMLElement | null>(null);
-
+const md = new MarkdownIt();
+const renderMarkdown = (text) => {
+    return md.render(text);
+};
 const sendMessage = () => {
     if (newMessage.value.trim() !== '') {
         const now = new Date();

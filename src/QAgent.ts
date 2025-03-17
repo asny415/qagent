@@ -47,8 +47,8 @@ export class AIAgent {
             role: "assistant",
             content: currentMessage,
           });
-          this.process_rsp(currentMessage, cb);
-          break;
+          await this.process_rsp(currentMessage, cb);
+          return;
         }
         const chunk = decoder.decode(value);
         const lines = chunk.split("\n").filter((line) => line.trim() !== "");
@@ -73,7 +73,7 @@ export class AIAgent {
     this.msgBuffer = [
       {
         role: "user",
-        content: `At each turn, if you decide to invoke any of the function(s), it should be wrapped with \`\`\`tool_code\`\`\`. The python methods described below are imported and available, you can only use defined methods. The generated code should be readable and efficient. The response to a method will be wrapped in \`\`\`tool_output\`\`\` use it to call more tools or generate a helpful, friendly response. When using a \`\`\`tool_call\`\`\` think step by step why and how it should be used.
+        content: `在每一轮对话中,如果你决定调用任何一个function(s), 你需要使用 \`\`\`tool_code\`\`\` 包裹它们. The python methods described below are imported and available, you can only use defined methods. 请尽可能使用简洁有效的函数调用. 函数的响应将会被包裹在 \`\`\`tool_output\`\`\` 中，你可以通过它进行更多的函数调用或者生成对用户有帮助且友善的响应. When using a \`\`\`tool_call\`\`\` think step by step why and how it should be used.
 
 The following Python methods are available:
 
@@ -88,13 +88,18 @@ Args:
 def next_page() -> void:
 """turn the web browser to next page to get more content
 """
+
+def now() -> str:
+"""return cuttent time
+"""
 \`\`\`
 
-${task}
+now,please reply the following question in the question's language:${task}
 `,
       },
     ];
     await this.taskRun(cb);
+    this.msgBuffer = [];
   }
 
   async descriptImage(image: string, cb: ProgressCB) {
@@ -200,6 +205,8 @@ ${content}
       console.log("need run code", code);
       if (code.indexOf("next_page()") >= 0) {
         await this.nextPage(cb);
+      } else if (code.indexOf("now()") >= 0) {
+        return new Date().toISOString();
       } else if (code.match(browse_reg)) {
         let url = code.match(browse_reg)[1];
         if (url.startsWith("url=")) {

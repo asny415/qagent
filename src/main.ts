@@ -151,7 +151,7 @@ app.on("ready", () => {
           x: bounds.width / 2, // 触发滚动的 X 坐标（屏幕中的某处）
           y: bounds.height / 2, // 触发滚动的 Y 坐标
           deltaX: 0, // 不左右滚动
-          deltaY: -bounds.height * 0.7, // 负值代表向上滚动，数值控制滚动距离
+          deltaY: -bounds.height * 0.8, // 负值代表向上滚动，数值控制滚动距离
           canScroll: true,
         });
       }, 1000);
