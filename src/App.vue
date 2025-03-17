@@ -63,7 +63,7 @@ const sendMessage = () => {
             timestamp: time,
         });
         scrollToBottom();
-        agent.task(newMessage.value, (msg) => {
+        agent.task(newMessage.value, (type, msg, role, done) => {
             const now = new Date();
             const hours = now.getHours().toString().padStart(2, '0');
             const minutes = now.getMinutes().toString().padStart(2, '0');
@@ -75,6 +75,17 @@ const sendMessage = () => {
                 text: msg,
                 timestamp: time,
             }
+            if (done) {
+                messages.value.push({
+                    id: nextMessageId.value++,
+                    sender: role === 'user' ? 'user' : 'other',
+                    senderName: "Agent",
+                    text: msg,
+                    timestamp: time,
+                })
+                newAgegntMessage.value = null;
+            }
+            scrollToBottom();
         });
         newMessage.value = '';
     }

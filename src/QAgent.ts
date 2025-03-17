@@ -1,12 +1,20 @@
 import { nextTick } from "vue";
 import { loadUrl, captureScreen, pageDown } from "./ElectronWindow";
 const API_BASE_URL = "http://192.168.3.227:11434/api";
+
+type ProgressCB = (
+  type: string,
+  msg: string,
+  role: string,
+  done: string
+) => void;
+
 export class AIAgent {
   constructor() {
     this.msgBuffer = [];
   }
 
-  async taskRun(cb: (msg: string) => void) {
+  async taskRun(cb: ProgressCB) {
     try {
       const response = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
@@ -34,6 +42,7 @@ export class AIAgent {
         const { done, value } = await reader.read();
         if (done) {
           finish = true;
+          cb("response", currentMessage, "assistant", true);
           this.msgBuffer.push({
             role: "assistant",
             content: currentMessage,
@@ -48,7 +57,7 @@ export class AIAgent {
           const data = JSON.parse(line);
           if (data.message) {
             currentMessage += data.message.content;
-            cb(currentMessage);
+            cb("response", currentMessage, "assistant", false);
           }
         }
         await nextTick();
@@ -59,7 +68,7 @@ export class AIAgent {
     }
   }
 
-  async task(task: string, cb: (msg: string) => void) {
+  async task(task: string, cb: ProgressCB) {
     console.log("running task:", task);
     this.msgBuffer = [
       {
@@ -88,7 +97,7 @@ ${task}
     await this.taskRun(cb);
   }
 
-  async descriptImage(image: string) {
+  async descriptImage(image: string, cb: ProgressCB) {
     try {
       const response = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
@@ -122,6 +131,7 @@ ${task}
         const { done, value } = await reader.read();
         if (done) {
           finish = true;
+          cb("vision", currentMessage, "assistant", true);
           return currentMessage;
         }
         const chunk = decoder.decode(value);
@@ -130,8 +140,8 @@ ${task}
         for (const line of lines) {
           const data = JSON.parse(line);
           if (data.message) {
-            console.log("get line", data.message.content);
             currentMessage += data.message.content;
+            cb("vision", currentMessage);
           }
         }
         await nextTick();
@@ -141,7 +151,7 @@ ${task}
     }
   }
 
-  async nextPage(cb: (msg: string) => void) {
+  async nextPage(cb: ProgressCB) {
     console.log("need to do next page");
     await pageDown();
     //等待5秒钟以确保内容加载完毕
@@ -149,7 +159,7 @@ ${task}
     console.log("browser loaded");
     const data = await captureScreen();
     console.log("browser screen is", data);
-    const content = await this.descriptImage(data.split("base64,")[1]);
+    const content = await this.descriptImage(data.split("base64,")[1], cb);
     console.log("image content is", content);
     if (content) {
       this.msgBuffer.push({
@@ -162,7 +172,7 @@ ${content}
     }
   }
 
-  async browse(url: string, cb: (msg: string) => void) {
+  async browse(url: string, cb: ProgressCB) {
     console.log(`need browser url:${url}`);
     await loadUrl(url);
     //等待5秒钟以确保内容加载完毕
@@ -170,7 +180,7 @@ ${content}
     console.log("browser loaded");
     const data = await captureScreen();
     console.log("browser screen is", data);
-    const content = await this.descriptImage(data.split("base64,")[1]);
+    const content = await this.descriptImage(data.split("base64,")[1], cb);
     console.log("image content is", content);
     if (content) {
       this.msgBuffer.push({
@@ -182,7 +192,7 @@ ${content}
       await this.taskRun(cb);
     }
   }
-  async process_rsp(text: string, cb: (msg: string) => void) {
+  async process_rsp(text: string, cb: ProgressCB) {
     const toolcode_reg = /```tool_code\n(.*?)\n```/s;
     const browse_reg = /browse\((.*?)\)/s;
     if (text.match(toolcode_reg)) {
