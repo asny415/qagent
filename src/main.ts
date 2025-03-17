@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, BrowserView, session } from "electron";
 import path from "path";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -9,10 +9,11 @@ if (require("electron-squirrel-startup")) {
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
+    width: 1200, // Increased width to accommodate two views
     height: 600,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      // contextIsolation:false, //disable it for test
     },
   });
 
@@ -25,8 +26,31 @@ const createWindow = () => {
     );
   }
 
-  // Open the DevTools.
+  // Create the right-side BrowserView
+  const rightView = new BrowserView({
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      // contextIsolation:false,
+    },
+  });
+  mainWindow.addBrowserView(rightView);
+
+  // Set the bounds of the right-side view (half of the window width)
+  const { width, height } = mainWindow.getBounds();
+  rightView.setBounds({ x: width / 2, y: 0, width: width / 2, height });
+  // Load a URL in the right-side view
+  rightView.webContents.loadURL("https://www.google.com");
+
+  // Handle window resize to adjust view bounds
+  mainWindow.on("resize", () => {
+    const { width, height } = mainWindow.getBounds();
+    rightView.setBounds({ x: width / 2, y: 0, width: width / 2, height });
+  });
+
+  // Open the DevTools for main window.
   // mainWindow.webContents.openDevTools();
+
+  // rightView.webContents.openDevTools();
 };
 
 // This method will be called when Electron has finished
