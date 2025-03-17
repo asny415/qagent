@@ -89,12 +89,11 @@ def next_page() -> void:
 """turn the web browser to next page to get more content
 """
 
-def now() -> str:
-"""return cuttent time
-"""
 \`\`\`
 
-now,please reply the following question in the question's language:${task}
+现在是${
+          new Date().toISOString
+        },please reply the following question in the question's language:${task}
 `,
       },
     ];
@@ -205,8 +204,6 @@ ${content}
       console.log("need run code", code);
       if (code.indexOf("next_page()") >= 0) {
         await this.nextPage(cb);
-      } else if (code.indexOf("now()") >= 0) {
-        return new Date().toISOString();
       } else if (code.match(browse_reg)) {
         let url = code.match(browse_reg)[1];
         if (url.startsWith("url=")) {
