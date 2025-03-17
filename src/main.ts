@@ -52,11 +52,11 @@ const createWindow = () => {
   // Handle window resize to adjust view bounds
   mainWindow.on("resize", () => {
     if (!rightView || !mainWindow) return;
-    const { width, height } = mainWindow.getBounds();
+    const { width, height } = mainWindow.getContentBounds();
     setViewsBounds(width, height);
   });
   // Open the DevTools for main window in the bottom.
-  mainWindow.webContents.openDevTools({ mode: "bottom" });
+  // mainWindow.webContents.openDevTools({ mode: "bottom" });
 
   // rightView.webContents.openDevTools();
 };
