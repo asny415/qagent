@@ -1,7 +1,7 @@
 <template>
     <div class="chat-container">
         <div class="chat-header">
-            <h2>Chat Room</h2>
+            <h2>Ollama Gemma3</h2>
         </div>
         <div class="chat-history" ref="chatHistory">
             <div v-for="message in messages" :key="message.id"
