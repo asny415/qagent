@@ -45,9 +45,11 @@ const createWindow = () => {
   });
   mainWindow.addBrowserView(rightView);
 
-  // Set the bounds of the right-side view (half of the window width)
-  const { width, height } = mainWindow.getBounds();
-  setViewsBounds(width, height);
+  setTimeout(() => {
+    // Set the bounds of the right-side view (half of the window width)
+    const { width, height } = mainWindow.getContentBounds();
+    setViewsBounds(width, height);
+  }, 1000);
 
   // Handle window resize to adjust view bounds
   mainWindow.on("resize", () => {
