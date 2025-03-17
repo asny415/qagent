@@ -12,6 +12,13 @@
                 </div>
                 <span class="message-time">{{ message.timestamp }}</span>
             </div>
+            <div :class="['message', 'received']" v-if="newAgegntMessage">
+                <div class="message-content">
+                    <span class="message-sender">{{ newAgegntMessage.senderName }}:</span>
+                    <p class="message-text">{{ newAgegntMessage.text }}</p>
+                </div>
+                <span class="message-time">{{ newAgegntMessage.timestamp }}</span>
+            </div>
         </div>
         <div class="chat-input">
             <input type="text" v-model="newMessage" @keyup.enter="sendMessage"
@@ -23,7 +30,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue';
-
+import { AIAgent } from './QAgent'
 interface Message {
     id: number;
     sender: 'user' | 'other';
@@ -32,16 +39,11 @@ interface Message {
     timestamp: string;
 }
 
+const agent = new AIAgent()
 const messages = ref<Message[]>([
-    { id: 1, sender: 'other', senderName: "Alice", text: 'Hello!', timestamp: '10:00 AM' },
-    { id: 2, sender: 'user', senderName: "You", text: 'Hi Alice!', timestamp: '10:01 AM' },
-    { id: 3, sender: 'other', senderName: "Bob", text: 'Hey everyone!', timestamp: '10:05 AM' },
-    { id: 4, sender: 'user', senderName: "You", text: 'Hello bob', timestamp: '10:06 AM' },
-    { id: 5, sender: 'other', senderName: "Alice", text: 'how are you?', timestamp: '10:08 AM' },
-    { id: 6, sender: 'user', senderName: "You", text: 'great.', timestamp: '10:09 AM' },
 ]);
-
-const newMessage = ref('');
+const newMessage = ref('埃隆马斯克最近都发了哪些推特');
+const newAgegntMessage = ref<Message>(null);
 const nextMessageId = ref(7);
 const chatHistory = ref<HTMLElement | null>(null);
 
@@ -59,8 +61,21 @@ const sendMessage = () => {
             text: newMessage.value,
             timestamp: time,
         });
-        newMessage.value = '';
         scrollToBottom();
+        agent.task(newMessage.value, (msg) => {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const time = `${hours}:${minutes}`;
+            newAgegntMessage.value = {
+                id: -1,
+                sender: 'other',
+                senderName: "Agent",
+                text: msg,
+                timestamp: time,
+            }
+        });
+        newMessage.value = '';
     }
 };
 

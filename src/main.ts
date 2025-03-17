@@ -58,7 +58,7 @@ const createWindow = () => {
     setViewsBounds(width, height);
   });
   // Open the DevTools for main window in the bottom.
-  // mainWindow.webContents.openDevTools({ mode: "bottom" });
+  mainWindow.webContents.openDevTools({ mode: "bottom" });
 
   // rightView.webContents.openDevTools();
 };
@@ -121,7 +121,10 @@ app.on("ready", () => {
   // Listen for the 'change-url' event from the renderer process
   ipcMain.handle("change-url", (event, url) => {
     if (rightView) {
+      console.log(`right view should load url ${url}`);
       rightView.webContents.loadURL(url);
+    } else {
+      console.error("rightView is not available.");
     }
   });
 
