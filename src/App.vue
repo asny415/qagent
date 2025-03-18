@@ -4,13 +4,18 @@
             <h2>Ollama Gemma3</h2>
         </div>
         <div class="chat-history" ref="chatHistory">
-            <div v-for="message in messages" :key="message.id"
-                :class="['message', message.sender === 'user' ? 'sent' : 'received']">
-                <div class="message-content">
-                    <span class="message-sender">{{ message.senderName }}:</span>
-                    <p class="message-text" v-html="renderMarkdown(message.text)"></p>
-                </div>
-                <span class="message-time">{{ message.timestamp }}</span>
+            <div v-for="message in messages" :key="message.id" :class="['message', message.type === 'hr' ? 'hr' :
+                message.sender === 'user' ? 'sent' : 'received']">
+                <template v-if="message.type === 'hr'">
+                    <hr class="message-divider">
+                </template>
+                <template v-else>
+                    <div class="message-content">
+                        <span class="message-sender">{{ message.senderName }}:</span>
+                        <p class="message-text" v-html="renderMarkdown(message.text)"></p>
+                    </div>
+                    <span class="message-time">{{ message.timestamp }}</span>
+                </template>
             </div>
             <div :class="['message', 'received']" v-if="newAgegntMessage && newAgegntMessage.text">
                 <div class="message-content">
@@ -28,9 +33,9 @@
             </div>
         </div>
         <div class="chat-input">
-            <input type="text" v-model="newMessage" @keyup.enter="sendMessage"
+            <input type="text" :disabled="running" v-model="newMessage" @keyup.enter="sendMessage"
                 placeholder="Type your message here..." />
-            <button @click="sendMessage">Send</button>
+            <button :disabled="running" @click="sendMessage" :class="{ 'disabled-button': running }">Send</button>
         </div>
     </div>
 </template>
@@ -46,6 +51,7 @@ interface Message {
     senderName: string;
     text: string;
     timestamp: string;
+    type?: string;
 }
 
 const agent = new AIAgent()
@@ -55,6 +61,7 @@ const newMessage = ref('埃隆马斯克最近都发了哪些推特');
 const newAgegntMessage = ref<Message>(null);
 const nextMessageId = ref(7);
 const loading = ref(false)
+const running = ref(false)
 const chatHistory = ref<HTMLElement | null>(null);
 const md = new MarkdownIt();
 const renderMarkdown = (text) => {
@@ -62,6 +69,7 @@ const renderMarkdown = (text) => {
 };
 const sendMessage = () => {
     if (newMessage.value.trim() !== '') {
+        running.value = true
         const now = new Date();
         const hours = now.getHours().toString().padStart(2, '0');
         const minutes = now.getMinutes().toString().padStart(2, '0');
@@ -77,6 +85,14 @@ const sendMessage = () => {
         scrollToBottom();
         agent.task(newMessage.value, (type, msg = "", role = "agent", done = false) => {
             loading.value = type == 'thinking'
+            running.value = type !== 'done'
+            if (!running.value) {
+                messages.value.push({
+                    id: nextMessageId.value++,
+                    type: "hr",
+                    text: ""
+                })
+            }
             console.log("loading set to", loading.value, type)
             const now = new Date();
             const hours = now.getHours().toString().padStart(2, '0');
@@ -155,6 +171,10 @@ onMounted(() => {
     border-radius: 10px;
 }
 
+.hr {
+    max-width: 100%;
+}
+
 .message.sent {
     align-self: flex-end;
     background-color: #dcf8c6;
@@ -202,6 +222,15 @@ onMounted(() => {
     cursor: pointer;
 }
 
+.chat-input button.disabled-button {
+    background-color: #cccccc;
+    /* Grey background */
+    color: #666666;
+    /* Dark grey text */
+    cursor: default;
+    /* Change cursor to default */
+}
+
 /* Animation styles */
 .thinking-animation {
     display: flex;
@@ -246,5 +275,13 @@ onMounted(() => {
     50% {
         transform: translateY(-0.5rem);
     }
+}
+
+/* divider styles */
+.message-divider {
+    width: 99%;
+    margin: 10px auto;
+    border: none;
+    border-top: 1px solid #ddd;
 }
 </style>
