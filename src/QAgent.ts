@@ -212,7 +212,7 @@ ${content}
   }
   async process_rsp(text: string, cb: ProgressCB) {
     const toolcode_reg = /```tool_code\n(.*?)\n```/s;
-    const browse_reg = /browse\((.*?)\)/s;
+    const browse_reg = /browse\((?:url=)['"](.*)['"]\)/s;
     if (text.match(toolcode_reg)) {
       cb("thinking");
       const code = text.match(toolcode_reg)[1];
@@ -220,11 +220,8 @@ ${content}
       if (code.indexOf("next_page()") >= 0) {
         await this.nextPage(cb);
       } else if (code.match(browse_reg)) {
-        let url = code.match(browse_reg)[1];
-        if (url.startsWith("url=")) {
-          url = url.slice(4);
-        }
-        await this.browse(JSON.parse(url), cb);
+        const url = code.match(browse_reg)[1];
+        await this.browse(url, cb);
       }
     }
   }
