@@ -73,9 +73,9 @@ export class AIAgent {
     this.msgBuffer = [
       {
         role: "user",
-        content: `在每一轮对话中,如果你决定调用任何一个function(s), 你需要使用 \`\`\`tool_code\`\`\` 包裹它们. The python methods described below are imported and available, you can only use defined methods. 请尽可能使用简洁有效的函数调用. 函数的响应将会被包裹在 \`\`\`tool_output\`\`\` 中，你可以通过它进行更多的函数调用或者生成对用户有帮助且友善的响应. When using a \`\`\`tool_call\`\`\` think step by step why and how it should be used.
+        content: `你是一个聪明的agent，会用用户的语言帮助查找想要的信息。你会利用并且只能利用下面的这些 python methods 扩展自己的能力, 如果你决定调用任何一个function(s), 你需要使用 \`\`\`tool_code\`\`\` 包裹它们，请尽可能使用简洁有效的函数调用并且调用函数的次数在一轮提问中最多不超过5次. 函数的响应将会被包裹在 \`\`\`tool_output\`\`\` 中并且你应该假设用户看不到其中的内容，你可以利用函数响应的内容进行更多次函数调用或者直接生成对用户有帮助且友善的响应. 在通过 \`\`\`tool_call\`\`\` 进行函数调用时，请逐步解释为什么你需要这样做.
 
-The following Python methods are available:
+你可以使用下面的这些函数:
 
 \`\`\`python
 def browse(url: str) -> str:
@@ -91,9 +91,7 @@ def next_page() -> void:
 
 \`\`\`
 
-现在是${
-          new Date().toISOString
-        },please reply the following question in the question's language:${task}
+现在的时间是${new Date().toISOString},请你用用户的语言回答下面的用户提问:${task}
 `,
       },
     ];

@@ -4,6 +4,7 @@ import {
   BrowserView,
   ipcMain,
   WebContents,
+  screen,
 } from "electron";
 import path from "path";
 
@@ -18,10 +19,14 @@ const LEFT_VIEW_WIDTH_RATIO = 0.5; // Define the ratio of left view's width. Adj
 const MIN_LEFT_VIEW_WIDTH = 300; // Set a minimum width for the left view to prevent it from becoming too small.
 
 const createWindow = () => {
+  const height = Math.round(
+    (screen.getPrimaryDisplay().workAreaSize.height * 3) / 4
+  );
+  const width = Math.round((height * 18) / 16);
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1200, // Increased width to accommodate two views
-    height: 600,
+    width, // Increased width to accommodate two views
+    height,
     minWidth: MIN_LEFT_VIEW_WIDTH * 2, // Ensure window cannot be smaller than two times minimum view
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -50,16 +55,18 @@ const createWindow = () => {
     },
   });
   mainWindow.addBrowserView(rightView);
-  // rightView.webContents.loadURL("https://twitter.com/elonmusk");
+  rightView.webContents.loadURL("https://www.google.com");
 
   // Monitor the dom-ready event for rightView
   monitorRightViewDomReady(rightView.webContents);
 
-  setTimeout(() => {
-    // Set the bounds of the right-side view (half of the window width)
-    const { width, height } = mainWindow.getContentBounds();
-    setViewsBounds(width, height);
-  }, 1000);
+  mainWindow.webContents.on("did-finish-load", () => {
+    setTimeout(() => {
+      // Set the bounds of the right-side view (half of the window width)
+      const { width, height } = mainWindow.getContentBounds();
+      setViewsBounds(width, height);
+    }, 1000);
+  });
 
   // Handle window resize to adjust view bounds
   mainWindow.on("resize", () => {
