@@ -102,6 +102,7 @@ def next_page() -> void:
   }
 
   async descriptImage(image: string, cb: ProgressCB) {
+    cb("thinking");
     try {
       const response = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
@@ -200,6 +201,7 @@ ${content}
     const toolcode_reg = /```tool_code\n(.*?)\n```/s;
     const browse_reg = /browse\((.*?)\)/s;
     if (text.match(toolcode_reg)) {
+      cb("thinking");
       const code = text.match(toolcode_reg)[1];
       console.log("need run code", code);
       if (code.indexOf("next_page()") >= 0) {

@@ -12,7 +12,7 @@
                 </div>
                 <span class="message-time">{{ message.timestamp }}</span>
             </div>
-            <div :class="['message', 'received']" v-if="newAgegntMessage">
+            <div :class="['message', 'received']" v-if="newAgegntMessage && newAgegntMessage.text">
                 <div class="message-content">
                     <span class="message-sender">{{ newAgegntMessage.senderName }}:</span>
                     <p class="message-text" v-html="renderMarkdown(newAgegntMessage.text)"></p>
@@ -75,8 +75,9 @@ const sendMessage = () => {
             timestamp: time,
         });
         scrollToBottom();
-        agent.task(newMessage.value, (type, msg, role, done) => {
+        agent.task(newMessage.value, (type, msg = "", role = "agent", done = false) => {
             loading.value = type == 'thinking'
+            console.log("loading set to", loading.value, type)
             const now = new Date();
             const hours = now.getHours().toString().padStart(2, '0');
             const minutes = now.getMinutes().toString().padStart(2, '0');
