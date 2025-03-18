@@ -19,6 +19,13 @@
                 </div>
                 <span class="message-time">{{ newAgegntMessage.timestamp }}</span>
             </div>
+            <div v-if="loading" class="thinking-animation">
+                <div class="dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
         </div>
         <div class="chat-input">
             <input type="text" v-model="newMessage" @keyup.enter="sendMessage"
@@ -47,6 +54,7 @@ const messages = ref<Message[]>([
 const newMessage = ref('埃隆马斯克最近都发了哪些推特');
 const newAgegntMessage = ref<Message>(null);
 const nextMessageId = ref(7);
+const loading = ref(false)
 const chatHistory = ref<HTMLElement | null>(null);
 const md = new MarkdownIt();
 const renderMarkdown = (text) => {
@@ -68,6 +76,7 @@ const sendMessage = () => {
         });
         scrollToBottom();
         agent.task(newMessage.value, (type, msg, role, done) => {
+            loading.value = type == 'thinking'
             const now = new Date();
             const hours = now.getHours().toString().padStart(2, '0');
             const minutes = now.getMinutes().toString().padStart(2, '0');
@@ -190,5 +199,51 @@ onMounted(() => {
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
+}
+
+/* Animation styles */
+.thinking-animation {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.dots {
+    display: flex;
+    gap: 0.2rem;
+}
+
+.dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: #777;
+    border-radius: 50%;
+    animation: bounce 1s ease-in-out infinite;
+}
+
+.dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.thinking-text {
+    color: #777;
+    font-size: 0.9rem;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-0.5rem);
+    }
 }
 </style>

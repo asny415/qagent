@@ -15,6 +15,7 @@ export class AIAgent {
   }
 
   async taskRun(cb: ProgressCB) {
+    cb("thinking");
     try {
       const response = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
@@ -97,6 +98,7 @@ def next_page() -> void:
     ];
     await this.taskRun(cb);
     this.msgBuffer = [];
+    cb("done");
   }
 
   async descriptImage(image: string, cb: ProgressCB) {
