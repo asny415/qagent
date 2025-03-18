@@ -1,5 +1,10 @@
 import { nextTick } from "vue";
-import { loadUrl, captureScreen, pageDown } from "./ElectronWindow";
+import {
+  loadUrl,
+  captureScreen,
+  pageDown,
+  dumpVisible,
+} from "./ElectronWindow";
 const API_BASE_URL = "http://192.168.3.227:11434/api";
 
 type ProgressCB = (
@@ -17,6 +22,9 @@ export class AIAgent {
   async taskRun(cb: ProgressCB) {
     cb("thinking");
     try {
+      if (this.msgBuffer.length >= 10) {
+        throw new Error("too many messages");
+      }
       const response = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
         headers: {
@@ -115,7 +123,7 @@ def next_page() -> void:
           messages: [
             {
               role: "user",
-              content: `请详细描述这幅图片的内容，尤其不要遗漏任何文字内容`,
+              content: `请详细描述这幅图片里的内容`,
               images: [image],
             },
           ],
@@ -137,7 +145,12 @@ def next_page() -> void:
         if (done) {
           finish = true;
           cb("vision", currentMessage, "assistant", true);
-          return currentMessage;
+          const dump = await dumpVisible();
+          console.log("dump screen got", dump);
+
+          return `${currentMessage}
+页面上详细的文字和链接内容如下：
+${dump}`;
         }
         const chunk = decoder.decode(value);
         const lines = chunk.split("\n").filter((line) => line.trim() !== "");

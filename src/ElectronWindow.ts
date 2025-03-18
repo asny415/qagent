@@ -25,6 +25,14 @@ export const captureScreen = async (): string => {
   }
 };
 
+export const dumpVisible = async (): string => {
+  if (window.myAPI && window.myAPI.send) {
+    return await window.myAPI.send("dump-visible", null);
+  } else {
+    console.error("electronAPI.send is not available!");
+  }
+};
+
 export const pageDown = async () => {
   if (window.myAPI && window.myAPI.send) {
     await window.myAPI.send("next-page");

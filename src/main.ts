@@ -79,7 +79,6 @@ const createWindow = () => {
   });
   // Open the DevTools for main window in the bottom.
   // mainWindow.webContents.openDevTools({ mode: "bottom" });
-
   // rightView.webContents.openDevTools({ mode: "bottom" });
 };
 
@@ -187,6 +186,46 @@ app.on("ready", () => {
   ipcMain.handle("capture-right-view", async () => {
     console.log("*** debug, need capture right view");
     return await captureRightView();
+  });
+
+  ipcMain.handle("dump-visible", async () => {
+    const result = await rightView.webContents.executeJavaScript(`(()=>{
+      
+function dumpvisible(node,viewpoint={left:0,top:0,right:window.innerWidth, bottom:window.innerHeight}) {
+    let result = "";
+    if (['SCRIPT', 'STYLE', 'NOSCRIPT','#comment'].indexOf(node.nodeName)>=0) return result;
+    if (!node.getBoundingClientRect) return result;
+    if (node.textContent) {
+        const rect = node.getBoundingClientRect();
+        let inside = false
+        if (node.checkVisibility && !node.checkVisibility()) {
+            return result;
+        }
+        if (rect.left >= viewpoint.left && rect.right <= viewpoint.right && rect.top >= viewpoint.top && rect.bottom <= viewpoint.bottom) {
+            inside = true;
+        }
+        for (const c of (node.childNodes || [])) {
+            if (c.nodeName == "#text") {
+                if (inside) {
+                    result += c.textContent;
+                }
+            } else {
+                if (c.nodeName == 'A' && inside) {
+                    result += \`<a href="\${c.href}">\`
+                }
+                result += \` \${dumpvisible(c, viewpoint, result)} \`;
+                if (c.nodeName == 'A' && inside) {
+                    result += \`</a>\`
+                }
+            }
+        }        
+    }
+    return result;
+}
+
+      return dumpvisible(document.body)
+})()`);
+    return result;
   });
 });
 
