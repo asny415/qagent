@@ -213,7 +213,7 @@ function dumpvisible(node,viewpoint={left:0,top:0,right:window.innerWidth, botto
                 if (c.nodeName == 'A' && inside) {
                     result += \`<a href="\${c.href}">\`
                 }
-                result += \` \${dumpvisible(c, viewpoint, result)} \`;
+                result += \` \${dumpvisible(c, viewpoint, result).trim()} \`;
                 if (c.nodeName == 'A' && inside) {
                     result += \`</a>\`
                 }
