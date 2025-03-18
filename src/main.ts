@@ -225,6 +225,7 @@ function dumpvisible(node,viewpoint={left:0,top:0,right:window.innerWidth, botto
 
       return dumpvisible(document.body)
 })()`);
+    console.log("page text", result);
     return result;
   });
 });
