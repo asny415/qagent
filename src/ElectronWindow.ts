@@ -17,6 +17,15 @@ export const loadUrl = async (url) => {
   }
 };
 
+export const getEnv = async (key) => {
+  if (window.myAPI && window.myAPI.send) {
+    return await window.myAPI.send("get-env", key);
+    console.log("change url called", key);
+  } else {
+    console.error("electronAPI.send is not available!");
+  }
+};
+
 export const iNiverseMixInNode = async (args) => {
   if (window.myAPI && window.myAPI.send) {
     return await window.myAPI.send("i-niverse-mix", args);
