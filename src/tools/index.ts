@@ -1,9 +1,10 @@
 import * as browserTools from "./browser";
 import * as telegram from "./telegram";
 import * as comfyui from "./comfyui";
+import * as draw from "./draw";
 import { DOC, ProgressCB, toPyType } from "./common";
 
-const toolsets = [browserTools, telegram, comfyui];
+const toolsets = [browserTools, telegram, comfyui, draw];
 const tools = toolsets.reduce(
   (r, i) => [
     ...r,
