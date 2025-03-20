@@ -46,7 +46,7 @@ export async function toolGo(rsp: string, cb: ProgressCB): string | boolean {
       const args = (module[`${fname}_doc`] as DOC)[1];
       const argsReg = (args || [])
         .map((arg) => `(?:${arg[0]}=)?['"](.*)['"]`)
-        .join(",");
+        .join("\\s*,\\s*");
       const funcreg = `^${fname}\\(${argsReg}\\)`;
       console.log(funcreg);
       const reg = new RegExp(funcreg);

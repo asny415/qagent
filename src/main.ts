@@ -153,6 +153,7 @@ app.on("ready", () => {
 
   ipcMain.handle("telegram-send", async (event, params) => {
     const { body, path } = params;
+    console.log("telegram send", body, path);
     const BOT_TOKEN = process.env["TG_BOT_TOKEN"];
     const CHAT_ID = process.env["TG_BOT_CHATID"];
     const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
