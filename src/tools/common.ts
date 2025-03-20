@@ -16,7 +16,9 @@ export type TOOL_FUNCTION = (
 ) => string | null;
 
 export function toPyType(type: string) {
-  return { string: "str", number: "int", boolean: "bool" }[type] || "str";
+  return (
+    { string: "str", number: "int", int: "int", boolean: "bool" }[type] || "str"
+  );
 }
 
 export async function descriptImage(image: string, cb: ProgressCB) {

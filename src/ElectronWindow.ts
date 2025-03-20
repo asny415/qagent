@@ -17,6 +17,24 @@ export const loadUrl = async (url) => {
   }
 };
 
+export const iNiverseMixInNode = async (args) => {
+  if (window.myAPI && window.myAPI.send) {
+    return await window.myAPI.send("i-niverse-mix", args);
+    console.log("iNiverseMixInNode called");
+  } else {
+    console.error("electronAPI.send is not available!");
+  }
+};
+
+export const fetchImageToDataUri = async (url) => {
+  if (window.myAPI && window.myAPI.send) {
+    return await window.myAPI.send("fetch-image-to-data-uri", url);
+    console.log("fetchImageToDataUri called");
+  } else {
+    console.error("electronAPI.send is not available!");
+  }
+};
+
 export const captureScreen = async (): string => {
   if (window.myAPI && window.myAPI.send) {
     return await window.myAPI.send("capture-right-view", null);

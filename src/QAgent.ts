@@ -13,7 +13,6 @@ export class AIAgent {
       if (this.msgBuffer.length >= 10) {
         throw new Error("too many messages");
       }
-      this.msgBuffer[this.msgBuffer.length - 1].content += `\n${task}`;
 
       const response = await fetch(`${API_BASE_URL}/chat`, {
         method: "POST",
@@ -81,7 +80,7 @@ export class AIAgent {
 ${doc}
 \`\`\`
 
-现在的时间是${new Date().toISOString},请你用用户的语言回答用户的提问:
+现在的时间是${new Date().toISOString},请你用用户的语言回答用户的提问: ${task}
 `,
       },
     ];

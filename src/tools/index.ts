@@ -1,8 +1,9 @@
 import * as browserTools from "./browser";
 import * as telegram from "./telegram";
+import * as comfyui from "./comfyui";
 import { DOC, ProgressCB, toPyType } from "./common";
 
-const toolsets = [browserTools, telegram];
+const toolsets = [browserTools, telegram, comfyui];
 const tools = toolsets.reduce(
   (r, i) => [
     ...r,
@@ -45,7 +46,7 @@ export async function toolGo(rsp: string, cb: ProgressCB): string | boolean {
       console.log("test tool", fname);
       const args = (module[`${fname}_doc`] as DOC)[1];
       const argsReg = (args || [])
-        .map((arg) => `(?:${arg[0]}=)?['"](.*)['"]`)
+        .map((arg) => `(?:${arg[0]}=)?['"]?(.*?)['"]?`)
         .join("\\s*,\\s*");
       const funcreg = `^${fname}\\(${argsReg}\\)`;
       console.log(funcreg);
@@ -57,6 +58,7 @@ export async function toolGo(rsp: string, cb: ProgressCB): string | boolean {
           params.reduce((r, v, idx) => {
             let value = v;
             if (args[idx][1] == "number") value = Number(v);
+            if (args[idx][1] == "int") value = Number(v);
             if (args[idx][1] == "boolean") value = Boolean(v);
             r[args[idx][0]] = value;
             return r;

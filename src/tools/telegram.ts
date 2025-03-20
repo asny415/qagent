@@ -1,5 +1,5 @@
 import convert from "telegramify-markdown";
-import { send2Telegram } from "../ElectronWindow";
+import { send2Telegram, fetchImageToDataUri } from "../ElectronWindow";
 import { DOC, TOOL_FUNCTION } from "./common";
 
 export const sendText_doc: DOC = [
@@ -38,12 +38,14 @@ export const sendMedia_doc: DOC = [
 
 export const sendMedia: TOOL_FUNCTION = async (args) => {
   const { caption, photo } = args;
+  console.log(`send media: "${photo}" "${caption}" to telegram`);
+
   await send2Telegram({
     path: "/sendPhoto",
     body: {
       type: "photo",
       caption: convert(caption, "escape"),
-      photo,
+      photo: photo,
     },
   });
 };
