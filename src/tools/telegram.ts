@@ -1,5 +1,5 @@
 import convert from "telegramify-markdown";
-import { send2Telegram, fetchImageToDataUri } from "../ElectronWindow";
+import { send2Telegram } from "../ElectronWindow";
 import { DOC, TOOL_FUNCTION } from "./common";
 
 export const sendText_doc: DOC = [

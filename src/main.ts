@@ -9,6 +9,7 @@ import {
 } from "electron";
 import path from "path";
 import * as handlers from "./handlers";
+import { startPollTG } from "./tgpoll";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -137,6 +138,20 @@ app.on("ready", () => {
       }
     );
   });
+
+  if (process.env.TG_START_POLL) {
+    startPollTG((update) => {
+      if (update.message) {
+        const message = update.message;
+        const chatId = message.chat.id;
+        const text = message.text;
+        if (text) {
+          console.log(`收到消息: ${text} 来自用户 ID: ${chatId}`);
+          mainWindow.webContents.send("tg-text", text);
+        }
+      }
+    });
+  }
 });
 
 // Quit when all windows are closed, except on macOS. There, it's common

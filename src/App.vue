@@ -67,6 +67,12 @@ const md = new MarkdownIt();
 const renderMarkdown = (text) => {
     return md.render(text);
 };
+
+window.myAPI.on("tg-text", (event, text) => {
+    newMessage.value = text;
+    sendMessage()
+})
+
 const sendMessage = () => {
     if (newMessage.value.trim() !== '') {
         running.value = true
