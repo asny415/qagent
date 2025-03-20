@@ -110,6 +110,8 @@ function setViewsBounds(windowWidth: number, windowHeight: number) {
   mainWindow.webContents.send("set-left-view-bounds", bounds);
 }
 
+global.rightViewDomReadyResolve = null;
+
 // Function to monitor dom-ready event
 function monitorRightViewDomReady(webContents: WebContents) {
   webContents.on("dom-ready", () => {
@@ -121,7 +123,6 @@ function monitorRightViewDomReady(webContents: WebContents) {
   });
 }
 
-let rightViewDomReadyResolve: () => void | null = null;
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
