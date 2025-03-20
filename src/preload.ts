@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld("myAPI", {
       "capture-right-view",
       "next-page",
       "dump-visible",
+      "telegram-send",
     ];
     if (validChannels.includes(channel)) {
       return ipcRenderer.invoke(channel, data);

@@ -1,3 +1,4 @@
+import "dotenv/config";
 import {
   app,
   BrowserWindow,
@@ -149,6 +150,28 @@ let rightViewDomReadyResolve: () => void | null = null;
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
   createWindow();
+
+  ipcMain.handle("telegram-send", async (event, params) => {
+    const { body, path } = params;
+    const BOT_TOKEN = process.env["TG_BOT_TOKEN"];
+    const CHAT_ID = process.env["TG_BOT_CHATID"];
+    const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
+
+    console.log("env", BOT_TOKEN, CHAT_ID);
+    const rsp = await fetch(`${TELEGRAM_API}${path}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        ...body,
+      }),
+    });
+    const json = await rsp.json();
+    console.log(json);
+    return json;
+  });
 
   ipcMain.handle("next-page", async () => {
     if (rightView) {

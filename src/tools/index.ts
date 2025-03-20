@@ -1,11 +1,18 @@
 import * as browserTools from "./browser";
+import * as telegram from "./telegram";
 import { DOC, ProgressCB, toPyType } from "./common";
 
-const browseToolNames = Object.keys(browserTools).filter(
-  (f) => !f.endsWith("_doc")
+const toolsets = [browserTools, telegram];
+const tools = toolsets.reduce(
+  (r, i) => [
+    ...r,
+    ...Object.keys(i)
+      .filter((f) => !f.endsWith("_doc"))
+      .map((f) => [i, f]),
+  ],
+  []
 );
 
-const tools = [...browseToolNames.map((f) => [browserTools, f])];
 function tooldDoc([module, fname]): string {
   // eslint-disable-next-line import/namespace
   const doc = module[`${fname}_doc`] as DOC;

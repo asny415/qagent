@@ -1,5 +1,5 @@
 import { loadUrl, captureScreen, pageDown } from "../ElectronWindow";
-import { descriptImage, DOC } from "./common";
+import { descriptImage, DOC, TOOL_FUNCTION } from "./common";
 
 export const browse_doc: DOC = [
   "浏览某个网址并返回首屏的内容",
