@@ -1,4 +1,3 @@
-import "global-agent/bootstrap";
 let offset = 0;
 
 const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TG_BOT_TOKEN}`;

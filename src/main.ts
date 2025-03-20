@@ -1,3 +1,4 @@
+import { setGlobalDispatcher, ProxyAgent } from "undici";
 import "dotenv/config";
 import {
   app,
@@ -15,6 +16,9 @@ import { startPollTG } from "./tgpoll";
 if (require("electron-squirrel-startup")) {
   app.quit();
 }
+
+const proxyAgent = new ProxyAgent({ uri: process.env.HTTPS_PROXY });
+setGlobalDispatcher(proxyAgent);
 
 let rightView: BrowserView | null = null; // Store rightView in a variable accessible within the module
 let mainWindow: BrowserWindow | null = null; // Store mainWindow in a variable accessible within the module
