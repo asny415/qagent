@@ -25,7 +25,7 @@ if (process.env.HTTPS_PROXY) {
 let rightView: BrowserView | null = null; // Store rightView in a variable accessible within the module
 let mainWindow: BrowserWindow | null = null; // Store mainWindow in a variable accessible within the module
 const LEFT_VIEW_WIDTH_RATIO = 0.5; // Define the ratio of left view's width. Adjust as needed (e.g., 0.5 for 50%)
-const MIN_LEFT_VIEW_WIDTH = 300; // Set a minimum width for the left view to prevent it from becoming too small.
+const MAX_LEFT_VIEW_WIDTH = 300; // Set a minimum width for the left view to prevent it from becoming too small.
 
 const createWindow = () => {
   const height = Math.round(
@@ -36,7 +36,7 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width, // Increased width to accommodate two views
     height,
-    minWidth: MIN_LEFT_VIEW_WIDTH * 2, // Ensure window cannot be smaller than two times minimum view
+    minWidth: MAX_LEFT_VIEW_WIDTH * 2, // Ensure window cannot be smaller than two times minimum view
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       // contextIsolation:false, //disable it for test
@@ -64,9 +64,6 @@ const createWindow = () => {
     },
   });
   mainWindow.addBrowserView(rightView);
-  const iPhoneUserAgent =
-    "Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1";
-  rightView.webContents.setUserAgent(iPhoneUserAgent);
   rightView.webContents.loadURL("https://www.google.com");
 
   // Monitor the dom-ready event for rightView
@@ -95,8 +92,8 @@ function setViewsBounds(windowWidth: number, windowHeight: number) {
   if (!mainWindow || !rightView) {
     return;
   }
-  const leftViewWidth = Math.max(
-    MIN_LEFT_VIEW_WIDTH,
+  const leftViewWidth = Math.min(
+    MAX_LEFT_VIEW_WIDTH,
     windowWidth * LEFT_VIEW_WIDTH_RATIO
   );
 

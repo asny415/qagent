@@ -86,7 +86,7 @@ export class AIAgent {
 ${doc}
 \`\`\`
 
-现在的时间是${new Date().toISOString},请你用用户的语言回答用户的提问: ${task}
+现在的时间是${new Date().toLocaleString()},请你用用户的语言回答用户的提问: ${task}
 `,
       },
     ];
