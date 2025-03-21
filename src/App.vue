@@ -69,25 +69,35 @@ const renderMarkdown = (text) => {
     return md.render(text);
 };
 
-window.myAPI.on("tg-text", (event, text) => {
-    agent.task(text, (type, msg = "", role = "agent", done = false) => {
-        if (type == 'thinking') {
-            send2Telegram({
-                path: "/sendChatAction",
-                body: {
-                    action: "typing"
-                }
-            })
-        } else if (done) {
-            send2Telegram({
-                path: "/sendMessage",
-                body: {
-                    text: convert(msg, "escape"),
-                    parse_mode: "MarkdownV2",
-                }
-            })
-        }
-    })
+window.myAPI.on("tg-text", async (event, text) => {
+    try {
+        await agent.task(text, (type, msg = "", role = "agent", done = false) => {
+            if (type == 'thinking') {
+                send2Telegram({
+                    path: "/sendChatAction",
+                    body: {
+                        action: "typing"
+                    }
+                })
+            } else if (done) {
+                send2Telegram({
+                    path: "/sendMessage",
+                    body: {
+                        text: convert(msg, "escape"),
+                        parse_mode: "MarkdownV2",
+                    }
+                })
+            }
+        })
+    } catch (err) {
+        send2Telegram({
+            path: "/sendMessage",
+            body: {
+                text: convert(`Error:${err.message}`, "escape"),
+                parse_mode: "MarkdownV2",
+            }
+        })
+    }
 })
 
 const sendMessage = () => {
