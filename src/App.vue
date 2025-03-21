@@ -71,8 +71,8 @@ const renderMarkdown = (text) => {
 
 window.myAPI.on("tg-text", async (event, text) => {
     if (running.value) {
-        if (text == "cancel") {
-            await task.cancel()
+        if (text.trim() == "cancel") {
+            await agent.cancel()
             send2Telegram({
                 path: "/sendMessage",
                 body: {
