@@ -139,42 +139,42 @@ const sendMessage = () => {
             timestamp: time,
         });
         scrollToBottom();
-        agent.task(newMessage.value, (type, msg = "", role = "agent", done = false) => {
-            loading.value = type == 'thinking'
-            //running 代表整个请求的结束
-            running.value = type !== 'done'
-            if (!running.value) {
-                messages.value.push({
-                    id: nextMessageId.value++,
-                    type: "hr",
-                    text: ""
-                })
-            }
-            console.log("loading set to", loading.value, type)
-            const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const time = `${hours}:${minutes}`;
-            newAgegntMessage.value = {
-                id: -1,
-                sender: 'other',
-                senderName: "Agent",
-                text: msg,
-                timestamp: time,
-            }
-            //done参数代表单轮运行的结束
-            if (done) {
-                messages.value.push({
-                    id: nextMessageId.value++,
-                    sender: role === 'user' ? 'user' : 'other',
+        try {
+            await agent.task(newMessage.value, (type, msg = "", role = "agent", done = false) => {
+                loading.value = type == 'thinking'
+                console.log("loading set to", loading.value, type)
+                const now = new Date();
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const time = `${hours}:${minutes}`;
+                newAgegntMessage.value = {
+                    id: -1,
+                    sender: 'other',
                     senderName: "Agent",
                     text: msg,
                     timestamp: time,
-                })
-                newAgegntMessage.value = null;
-            }
-            scrollToBottom();
-        });
+                }
+                //done参数代表单轮运行的结束
+                if (done) {
+                    messages.value.push({
+                        id: nextMessageId.value++,
+                        sender: role === 'user' ? 'user' : 'other',
+                        senderName: "Agent",
+                        text: msg,
+                        timestamp: time,
+                    })
+                    newAgegntMessage.value = null;
+                }
+                scrollToBottom();
+            });
+        } catch (err) {
+            console.error("error", err)
+        }
+        messages.value.push({
+            id: nextMessageId.value++,
+            type: "hr",
+            text: ""
+        })
         newMessage.value = '';
     }
 };
