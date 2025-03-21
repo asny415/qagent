@@ -41,10 +41,11 @@
 </template>
 
 <script setup lang="ts">
+import convert from "telegramify-markdown";
 import { ref, onMounted, nextTick } from 'vue';
 import MarkdownIt from 'markdown-it';
 import { AIAgent } from './QAgent'
-import { pageDown } from "./ElectronWindow.ts"
+import { pageDown, send2Telegram } from "./ElectronWindow.ts"
 interface Message {
     id: number;
     sender: 'user' | 'other';
@@ -57,7 +58,7 @@ interface Message {
 const agent = new AIAgent()
 const messages = ref<Message[]>([
 ]);
-const newMessage = ref('埃隆马斯克最近都发了哪些推特');
+const newMessage = ref('');
 const newAgegntMessage = ref<Message>(null);
 const nextMessageId = ref(7);
 const loading = ref(false)
@@ -69,8 +70,24 @@ const renderMarkdown = (text) => {
 };
 
 window.myAPI.on("tg-text", (event, text) => {
-    newMessage.value = text;
-    sendMessage()
+    agent.task(text, (type, msg = "", role = "agent", done = false) => {
+        if (type == 'thinking') {
+            send2Telegram({
+                path: "/sendChatAction",
+                body: {
+                    action: "typing"
+                }
+            })
+        } else if (done) {
+            send2Telegram({
+                path: "/sendMessage",
+                body: {
+                    text: convert(msg, "escape"),
+                    parse_mode: "MarkdownV2",
+                }
+            })
+        }
+    })
 })
 
 const sendMessage = () => {
@@ -91,6 +108,7 @@ const sendMessage = () => {
         scrollToBottom();
         agent.task(newMessage.value, (type, msg = "", role = "agent", done = false) => {
             loading.value = type == 'thinking'
+            //running 代表整个请求的结束
             running.value = type !== 'done'
             if (!running.value) {
                 messages.value.push({
@@ -111,6 +129,7 @@ const sendMessage = () => {
                 text: msg,
                 timestamp: time,
             }
+            //done参数代表单轮运行的结束
             if (done) {
                 messages.value.push({
                     id: nextMessageId.value++,
