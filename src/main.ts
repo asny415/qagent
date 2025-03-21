@@ -31,7 +31,7 @@ const createWindow = () => {
   const height = Math.round(
     (screen.getPrimaryDisplay().workAreaSize.height * 3) / 4
   );
-  const width = Math.round((height * 18) / 16);
+  const width = Math.round((height * 4) / 3 + 300);
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width, // Increased width to accommodate two views
