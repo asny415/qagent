@@ -60,6 +60,14 @@ export const dumpVisible = async (): string => {
   }
 };
 
+export const dumpFull = async (): string => {
+  if (window.myAPI && window.myAPI.send) {
+    return await window.myAPI.send("dump-full", null);
+  } else {
+    console.error("electronAPI.send is not available!");
+  }
+};
+
 export const send2Telegram = async (params): string => {
   if (window.myAPI && window.myAPI.send) {
     return await window.myAPI.send("telegram-send", params);

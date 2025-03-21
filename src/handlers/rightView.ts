@@ -53,6 +53,37 @@ export async function captureRightView(event, url, rightView) {
   }
 }
 
+export async function dumpFull(event, url, rightView) {
+  const result = await rightView.webContents.executeJavaScript(`(()=>{
+      
+        function dumpFull(node,viewpoint={left:0,top:0,right:window.innerWidth, bottom:window.innerHeight}) {
+            let result = "";
+            if (['SCRIPT', 'STYLE', 'NOSCRIPT','#comment'].indexOf(node.nodeName)>=0) return result;
+            if (!node.getBoundingClientRect) return result;
+            if (node.textContent) {
+                for (const c of (node.childNodes || [])) {
+                    if (c.nodeName == "#text") {
+                        result += c.textContent;
+                    } else {
+                        if (c.nodeName == 'A' && inside) {
+                            result += \`<a href="\${c.href}">\`
+                        }
+                        result += \` \${dumpFull(c, viewpoint, result).trim()} \`;
+                        if (c.nodeName == 'A' && inside) {
+                            result += \`</a>\`
+                        }
+                    }
+                }        
+            }
+            return result;
+        }
+        
+              return dumpFull(document.body)
+        })()`);
+  console.log("page text", result);
+  return result;
+}
+
 export async function dumpVisible(event, url, rightView) {
   const result = await rightView.webContents.executeJavaScript(`(()=>{
       
