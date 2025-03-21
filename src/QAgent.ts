@@ -5,6 +5,7 @@ import { toolGo, toolsDoc } from "./tools";
 export class AIAgent {
   constructor() {
     this.msgBuffer = [];
+    this.canceled = false;
   }
 
   async taskRun(task: string, cb: ProgressCB) {
@@ -34,12 +35,10 @@ export class AIAgent {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let currentMessage = "";
-      let finish = false;
 
-      while (!finish) {
+      while (!this.canceled) {
         const { done, value } = await reader.read();
         if (done) {
-          finish = true;
           cb("response", currentMessage, "assistant", true);
           this.msgBuffer.push({
             role: "assistant",
@@ -66,9 +65,16 @@ export class AIAgent {
     }
   }
 
+  //取消正在运行的task
+  cancel() {
+    console.log("cancel");
+    this.canceled = true;
+  }
+
   async task(task: string, cb: ProgressCB) {
     console.log("running task:", task);
     const doc = toolsDoc();
+    this.canceled = false;
     this.msgBuffer = [
       {
         role: "user",

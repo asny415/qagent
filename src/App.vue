@@ -70,8 +70,31 @@ const renderMarkdown = (text) => {
 };
 
 window.myAPI.on("tg-text", async (event, text) => {
+    if (running.value) {
+        if (text == "cancel") {
+            await task.cancel()
+            send2Telegram({
+                path: "/sendMessage",
+                body: {
+                    text: convert("canceling, please be patient", "escape"),
+                    parse_mode: "MarkdownV2",
+                }
+            })
+        } else {
+            send2Telegram({
+                path: "/sendMessage",
+                body: {
+                    text: convert("busy, send 'cancel' to cancel", "escape"),
+                    parse_mode: "MarkdownV2",
+                }
+            })
+        }
+        return;
+    }
+    running.value = true
     try {
         await agent.task(text, (type, msg = "", role = "agent", done = false) => {
+            running.value = type !== 'done'
             if (type == 'thinking') {
                 send2Telegram({
                     path: "/sendChatAction",
