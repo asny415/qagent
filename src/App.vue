@@ -94,7 +94,6 @@ window.myAPI.on("tg-text", async (event, text) => {
     running.value = true
     try {
         await agent.task(text, (type, msg = "", role = "agent", done = false) => {
-            running.value = type !== 'done'
             if (type == 'thinking') {
                 send2Telegram({
                     path: "/sendChatAction",
@@ -121,6 +120,7 @@ window.myAPI.on("tg-text", async (event, text) => {
             }
         })
     }
+    running.value = false
 })
 
 const sendMessage = async () => {
