@@ -2,7 +2,7 @@ import { loadUrl, captureScreen, pageDown, dumpFull } from "../ElectronWindow";
 import { descriptImage, DOC, TOOL_FUNCTION } from "./common";
 
 export const browse_doc: DOC = [
-  "浏览某个网址并返回首屏的内容",
+  "浏览某个网址并返回第一页的内容",
   [["url", "string", "要浏览的网址"]],
 ];
 
@@ -34,11 +34,11 @@ export const nextPage: TOOL_FUNCTION = async (args, cb) => {
   return content;
 };
 
-export const fetchPage_doc: DOC = [
-  "一次性获取某个网页全部的文字内容和链接，包括那些在可视区域范围外的内容，但是不会进行图像识别，因此不会返回任何图片上的文字",
+export const fetchWeb_doc: DOC = [
+  "一次性获取某个网址的全部文字内容和链接",
   [["url", "string", "要浏览的网址"]],
 ];
-export const fetchPage: TOOL_FUNCTION = async (args) => {
+export const fetchWeb: TOOL_FUNCTION = async (args) => {
   const url = args.url as string;
   console.log(`need browser url:${url}`);
   await loadUrl(url);

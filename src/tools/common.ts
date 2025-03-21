@@ -35,7 +35,7 @@ export async function descriptImage(image: string, cb: ProgressCB) {
         messages: [
           {
             role: "user",
-            content: `请详细描述这幅图片里的内容`,
+            content: `这幅图片里有些什么`,
             images: [image],
           },
         ],
