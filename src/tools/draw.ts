@@ -1,3 +1,4 @@
+import { getEnv } from "../ElectronWindow";
 export const drawCard_doc: DOC = [
   "抽卡操作使用随机的提示词和随机的大小生成随机的图片",
 ];

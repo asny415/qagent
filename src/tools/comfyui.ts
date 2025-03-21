@@ -1,4 +1,4 @@
-import { iNiverseMixInNode, loadUrl, getEnv } from "../ElectronWindow";
+import { iNiverseMixInNode, loadUrl } from "../ElectronWindow";
 import { DOC, TOOL_FUNCTION } from "./common";
 
 export const iNiverseMix_doc: DOC = [
