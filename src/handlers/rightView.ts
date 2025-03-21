@@ -56,20 +56,20 @@ export async function captureRightView(event, url, rightView) {
 export async function dumpFull(event, url, rightView) {
   const result = await rightView.webContents.executeJavaScript(`(()=>{
       
-        function dumpFull(node,viewpoint={left:0,top:0,right:window.innerWidth, bottom:window.innerHeight}) {
+        function dumpFull(node) {
             let result = "";
-            if (['SCRIPT', 'STYLE', 'NOSCRIPT','#comment'].indexOf(node.nodeName)>=0) return result;
+            if (['SCRIPT', 'STYLE', 'NOSCRIPT','#comment','svg'].indexOf(node.nodeName)>=0) return result;
             if (!node.getBoundingClientRect) return result;
             if (node.textContent) {
                 for (const c of (node.childNodes || [])) {
                     if (c.nodeName == "#text") {
                         result += c.textContent;
                     } else {
-                        if (c.nodeName == 'A' && inside) {
+                        if (c.nodeName == 'A' ) {
                             result += \`<a href="\${c.href}">\`
                         }
-                        result += \` \${dumpFull(c, viewpoint, result).trim()} \`;
-                        if (c.nodeName == 'A' && inside) {
+                        result += \` \${dumpFull(c).trim()} \`;
+                        if (c.nodeName == 'A') {
                             result += \`</a>\`
                         }
                     }
@@ -89,7 +89,7 @@ export async function dumpVisible(event, url, rightView) {
       
         function dumpvisible(node,viewpoint={left:0,top:0,right:window.innerWidth, bottom:window.innerHeight}) {
             let result = "";
-            if (['SCRIPT', 'STYLE', 'NOSCRIPT','#comment'].indexOf(node.nodeName)>=0) return result;
+            if (['SCRIPT', 'STYLE', 'NOSCRIPT','#comment','svg'].indexOf(node.nodeName)>=0) return result;
             if (!node.getBoundingClientRect) return result;
             if (node.textContent) {
                 const rect = node.getBoundingClientRect();
@@ -109,7 +109,7 @@ export async function dumpVisible(event, url, rightView) {
                         if (c.nodeName == 'A' && inside) {
                             result += \`<a href="\${c.href}">\`
                         }
-                        result += \` \${dumpvisible(c, viewpoint, result).trim()} \`;
+                        result += \` \${dumpvisible(c, viewpoint).trim()} \`;
                         if (c.nodeName == 'A' && inside) {
                             result += \`</a>\`
                         }

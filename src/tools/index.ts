@@ -47,7 +47,7 @@ export async function toolGo(rsp: string, cb: ProgressCB): string | boolean {
       console.log("test tool", fname);
       const args = (module[`${fname}_doc`] as DOC)[1];
       const argsReg = (args || [])
-        .map((arg) => `(?:${arg[0]}=)?['"]?(.*?)['"]?`)
+        .map((arg) => `(?:${arg[0]}=)?['"]?(.*)['"]?`)
         .join("\\s*,\\s*");
       const funcreg = `^${fname}\\(${argsReg}\\)`;
       console.log(funcreg);
@@ -58,6 +58,9 @@ export async function toolGo(rsp: string, cb: ProgressCB): string | boolean {
         return await module[fname](
           params.reduce((r, v, idx) => {
             let value = v;
+            if (value.endsWith('"') || value.endsWith("'")) {
+              value = value.slice(0, -1);
+            }
             if (args[idx][1] == "number") value = Number(v);
             if (args[idx][1] == "int") value = Number(v);
             if (args[idx][1] == "boolean") value = Boolean(v);
