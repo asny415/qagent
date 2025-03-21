@@ -342,4 +342,8 @@ onMounted(() => {
     border: none;
     border-top: 1px solid #ddd;
 }
+
+.message-text pre {
+    white-space: pre-wrap;
+}
 </style>
