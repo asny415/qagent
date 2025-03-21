@@ -343,7 +343,7 @@ onMounted(() => {
     border-top: 1px solid #ddd;
 }
 
-.message-text pre {
-    white-space: pre-wrap;
+.message-text {
+    word-break: break-all;
 }
 </style>
