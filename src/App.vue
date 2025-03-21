@@ -123,7 +123,7 @@ window.myAPI.on("tg-text", async (event, text) => {
     }
 })
 
-const sendMessage = () => {
+const sendMessage = async () => {
     if (newMessage.value.trim() !== '') {
         running.value = true
         const now = new Date();
