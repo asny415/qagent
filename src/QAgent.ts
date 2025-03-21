@@ -10,58 +10,53 @@ export class AIAgent {
 
   async taskRun(task: string, cb: ProgressCB) {
     cb("thinking");
-    try {
-      if (this.msgBuffer.length >= 10) {
-        throw new Error("too many messages");
+    if (this.msgBuffer.length >= 10) {
+      throw new Error("too many messages");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/chat`, {
+      method: "POST",
+      headers: {
+        accept: "text/event-stream",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gemma3:27b",
+        messages: this.msgBuffer,
+        stream: true,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let currentMessage = "";
+
+    while (!this.canceled) {
+      const { done, value } = await reader.read();
+      if (done) {
+        cb("response", currentMessage, "assistant", true);
+        this.msgBuffer.push({
+          role: "assistant",
+          content: currentMessage,
+        });
+        await this.process_rsp(task, currentMessage, cb);
+        return;
       }
+      const chunk = decoder.decode(value);
+      const lines = chunk.split("\n").filter((line) => line.trim() !== "");
 
-      const response = await fetch(`${API_BASE_URL}/chat`, {
-        method: "POST",
-        headers: {
-          accept: "text/event-stream",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "gemma3:27b",
-          messages: this.msgBuffer,
-          stream: true,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let currentMessage = "";
-
-      while (!this.canceled) {
-        const { done, value } = await reader.read();
-        if (done) {
-          cb("response", currentMessage, "assistant", true);
-          this.msgBuffer.push({
-            role: "assistant",
-            content: currentMessage,
-          });
-          await this.process_rsp(task, currentMessage, cb);
-          return;
+      for (const line of lines) {
+        const data = JSON.parse(line);
+        if (data.message) {
+          currentMessage += data.message.content;
+          cb("response", currentMessage, "assistant", false);
         }
-        const chunk = decoder.decode(value);
-        const lines = chunk.split("\n").filter((line) => line.trim() !== "");
-
-        for (const line of lines) {
-          const data = JSON.parse(line);
-          if (data.message) {
-            currentMessage += data.message.content;
-            cb("response", currentMessage, "assistant", false);
-          }
-        }
-        await nextTick();
       }
-      console.log("run finish");
-    } catch (error) {
-      console.error("Error sending message:", error);
+      await nextTick();
     }
   }
 
