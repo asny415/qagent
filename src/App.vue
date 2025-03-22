@@ -176,6 +176,7 @@ const sendMessage = async () => {
             text: ""
         })
         newMessage.value = '';
+        running.value = false
     }
 };
 
