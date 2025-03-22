@@ -1,20 +1,9 @@
-import * as browserTools from "./browser";
-import * as telegram from "./telegram";
-import * as comfyui from "./comfyui";
-import * as draw from "./draw";
-import * as wechat from "./wechat";
+import * as toolset from "./toolset";
 import { DOC, ProgressCB, toPyType } from "./common";
 
-const toolsets = [browserTools, telegram, comfyui, draw, wechat];
-const tools = toolsets.reduce(
-  (r, i) => [
-    ...r,
-    ...Object.keys(i)
-      .filter((f) => !f.endsWith("_doc"))
-      .map((f) => [i, f]),
-  ],
-  []
-);
+const tools = Object.keys(toolset)
+  .filter((f) => !f.endsWith("_doc"))
+  .map((f) => [toolset, f]);
 
 function tooldDoc([module, fname]): string {
   // eslint-disable-next-line import/namespace
