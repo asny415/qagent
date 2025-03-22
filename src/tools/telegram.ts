@@ -3,14 +3,8 @@ import { send2Telegram } from "../ElectronWindow";
 import { DOC, TOOL_FUNCTION } from "./common";
 
 export const sendText_doc: DOC = [
-  "给telegram用户发送文本消息，只需要提供文本消息内容即可，不需要关心其他参数",
-  [
-    [
-      "text",
-      "string",
-      "要发送的消息内容，支持多段文字，支持基础的Markdown语法",
-    ],
-  ],
+  "给我的telegram发送文本消息，只需要提供文本消息内容即可，不需要关心其他参数",
+  [["text", "string", "要发送的消息内容，支持多段文字"]],
 ];
 
 export const sendText: TOOL_FUNCTION = async (args) => {
@@ -18,7 +12,23 @@ export const sendText: TOOL_FUNCTION = async (args) => {
   await send2Telegram({
     path: "/sendMessage",
     body: {
-      text: convert(text, "escape"),
+      text: convert(text.replaceAll("\\n", "\n"), "escape"),
+      parse_mode: "MarkdownV2",
+    },
+  });
+};
+
+export const sendMarkdown_doc: DOC = [
+  "给我的telegram发送Markdown格式的消息，只需要提供文本消息内容即可，不需要关心其他参数",
+  [["md", "string", "要发送的Markdown格式的消息内容"]],
+];
+
+export const sendMarkdown: TOOL_FUNCTION = async (args) => {
+  const { md } = args;
+  await send2Telegram({
+    path: "/sendMessage",
+    body: {
+      text: md,
       parse_mode: "MarkdownV2",
     },
   });

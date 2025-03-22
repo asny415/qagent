@@ -43,8 +43,39 @@ export const browseWeb_doc: DOC = [
 export const browseWeb: TOOL_FUNCTION = async (args) => {
   const url = args.url as string;
   console.log(`need browser url:${url}`);
+  if (!url.startsWith("http")) {
+    throw new Error("不正确的网址");
+  }
   await loadUrl(url);
   //等待5秒钟以确保内容加载完毕
   await new Promise((r) => setTimeout(r, 5000));
   return dumpFull();
+};
+
+export const twitter_doc: DOC = [
+  "通过某个推特的地址获取最新的推特内容",
+  [["url", "string", "要访问的推特网址"]],
+];
+export const twitter: TOOL_FUNCTION = async (args) => {
+  const url = args.url as string;
+  console.log(`need browser url:${url}`);
+  if (!url.startsWith("http")) {
+    throw new Error("不正确的网址");
+  }
+  await loadUrl(url);
+  await new Promise((r) => setTimeout(r, 5000));
+  const str = await dumpFull();
+  const matchs = [
+    ...str
+      .matchAll(
+        /<a href="(https:\/\/x.com\/[^/]+\/status\/[\d]+)">([^<]*)<\/a>([\s\S]*?)<a href="https:\/\/x.com\/[^/]+\/status\/[\d]+\/analytics">/gm
+      )
+      .map((a) => a.slice(1)),
+  ];
+  if (matchs && matchs.length) {
+    return matchs
+      .map((x) => `在 ${x[1]} 发表了 ${x[2]}，网址为 ${x[0]}`)
+      .join("\n");
+  }
+  return "没有找到任何内容";
 };

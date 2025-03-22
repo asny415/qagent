@@ -181,6 +181,7 @@ const sendMessage = async () => {
             type: "hr",
             text: ""
         })
+        loading.value = false
         running.value = false
     }
 };
