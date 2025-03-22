@@ -35,9 +35,11 @@
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^5.2.2",
+    "browser-level": "^2.0.0",
     "classic-level": "^2.0.0",
     "dotenv": "^16.4.7",
     "electron-squirrel-startup": "^1.0.1",
+    "events": "^3.3.0",
     "form-data": "^4.0.2",
     "global-agent": "^3.0.0",
     "markdown-it": "^14.1.0",
