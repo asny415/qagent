@@ -62,7 +62,9 @@ export async function dumpFull(event, url, rightView) {
             if (!node.getBoundingClientRect) return result;
             if (node.textContent) {
                 for (const c of (node.childNodes || [])) {
-                    if (c.nodeName == "#text") {
+                    if (c.nodeName == "IMG") {
+                        result += \`<img src="\${c.src}"> alt="\${c.alt}" />\`
+                    } else if (c.nodeName == "#text") {
                         result += c.textContent;
                     } else {
                         if (c.nodeName == 'A' ) {
@@ -101,7 +103,11 @@ export async function dumpVisible(event, url, rightView) {
                     inside = true;
                 }
                 for (const c of (node.childNodes || [])) {
-                    if (c.nodeName == "#text") {
+                    if (c.nodeName == "IMG") {
+                        if (inside) {
+                            result += \`<img src="\${c.src}"> alt="\${c.alt}" />\`
+                        }
+                    } else if (c.nodeName == "#text") {
                         if (inside) {
                             result += c.textContent;
                         }

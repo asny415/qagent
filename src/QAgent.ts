@@ -34,11 +34,16 @@ export class AIAgent {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let currentMessage = "";
+    let token_i = 0,
+      token_o = 0;
 
     while (!this.canceled) {
       const { done, value } = await reader.read();
       if (done) {
-        cb("response", currentMessage, "assistant", true);
+        cb("response", currentMessage, "assistant", true, {
+          token_i,
+          token_o,
+        });
         this.msgBuffer.push({
           role: "assistant",
           content: currentMessage,
@@ -51,6 +56,12 @@ export class AIAgent {
 
       for (const line of lines) {
         const data = JSON.parse(line);
+        if (data.prompt_eval_count) {
+          token_i = data.prompt_eval_count;
+        }
+        if (data.eval_count) {
+          token_o = data.eval_count;
+        }
         if (data.message) {
           currentMessage += data.message.content;
           cb("response", currentMessage, "assistant", false);
@@ -81,7 +92,7 @@ export class AIAgent {
 ${doc}
 \`\`\`
 
-现在的时间是${new Date().toLocaleString()},请你用用户的语言回答用户的提问: ${task}
+现在的时间是${new Date().toLocaleString()}, ${task}
 `,
       },
     ];

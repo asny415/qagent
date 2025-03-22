@@ -8,7 +8,8 @@ export type ProgressCB = (
   type: string,
   msg: string,
   role: string,
-  done: string
+  done: boolean,
+  meta: Record<string, string | number | boolean> | null
 ) => void;
 export type TOOL_FUNCTION = (
   args: Record<string, string | number | boolean>,

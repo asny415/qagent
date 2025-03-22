@@ -14,7 +14,9 @@
                         <span class="message-sender">{{ message.senderName }}:</span>
                         <p class="message-text" v-html="renderMarkdown(message.text)"></p>
                     </div>
-                    <span class="message-time">{{ message.timestamp }}</span>
+                    <span class="message-time"> <span v-if="message.token_i">i:{{ message.token_i }}</span> <span
+                            v-if="message.token_o">o:{{ message.token_o }}</span> {{
+                                message.timestamp }}</span>
                 </template>
             </div>
             <div :class="['message', 'received']" v-if="newAgegntMessage && newAgegntMessage.text">
@@ -33,8 +35,9 @@
             </div>
         </div>
         <div class="chat-input">
-            <input type="text" :disabled="running" v-model="newMessage" @keyup.enter="sendMessage"
-                placeholder="Type your message here..." />
+            <textarea :disabled="running" v-model="newMessage" @keyup.enter="sendMessage"
+                placeholder="Type your message here..." ref="inputTextArea" rows="1"
+                @input="adjustTextAreaHeight"></textarea>
             <button :disabled="running" @click="sendMessage" :class="{ 'disabled-button': running }">Send</button>
         </div>
     </div>
@@ -42,7 +45,7 @@
 
 <script setup lang="ts">
 import convert from "telegramify-markdown";
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, watch } from 'vue';
 import MarkdownIt from 'markdown-it';
 import { AIAgent } from './QAgent'
 import { pageDown, send2Telegram } from "./ElectronWindow.ts"
@@ -64,6 +67,7 @@ const nextMessageId = ref(7);
 const loading = ref(false)
 const running = ref(false)
 const chatHistory = ref<HTMLElement | null>(null);
+const inputTextArea = ref<HTMLTextAreaElement | null>(null);
 const md = new MarkdownIt();
 const renderMarkdown = (text) => {
     return md.render(text);
@@ -130,19 +134,19 @@ const sendMessage = async () => {
         const hours = now.getHours().toString().padStart(2, '0');
         const minutes = now.getMinutes().toString().padStart(2, '0');
         const time = `${hours}:${minutes}`;
-
+        const task = newMessage.value
+        newMessage.value = ""
         messages.value.push({
             id: nextMessageId.value++,
             sender: 'user',
             senderName: "You",
-            text: newMessage.value,
+            text: task,
             timestamp: time,
         });
         scrollToBottom();
         try {
-            await agent.task(newMessage.value, (type, msg = "", role = "agent", done = false) => {
+            await agent.task(task, (type, msg = "", role = "agent", done = false, meta = {}) => {
                 loading.value = type == 'thinking'
-                console.log("loading set to", loading.value, type)
                 const now = new Date();
                 const hours = now.getHours().toString().padStart(2, '0');
                 const minutes = now.getMinutes().toString().padStart(2, '0');
@@ -162,6 +166,8 @@ const sendMessage = async () => {
                         senderName: "Agent",
                         text: msg,
                         timestamp: time,
+                        token_i: meta.token_i,
+                        token_o: meta.token_o,
                     })
                     newAgegntMessage.value = null;
                 }
@@ -175,7 +181,6 @@ const sendMessage = async () => {
             type: "hr",
             text: ""
         })
-        newMessage.value = '';
         running.value = false
     }
 };
@@ -187,8 +192,20 @@ const scrollToBottom = async () => {
     }
 };
 
+const adjustTextAreaHeight = () => {
+    if (inputTextArea.value) {
+        inputTextArea.value.style.height = 'auto';
+        inputTextArea.value.style.height = `${Math.min(inputTextArea.value.scrollHeight, 100)}px`; // 100px is roughly 4 lines
+    }
+};
+
 onMounted(() => {
     scrollToBottom();
+    adjustTextAreaHeight();
+});
+
+watch(newMessage, () => {
+    adjustTextAreaHeight();
 });
 </script>
 
@@ -265,11 +282,18 @@ onMounted(() => {
     gap: 10px;
 }
 
-.chat-input input {
+.chat-input textarea {
     flex-grow: 1;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    resize: none;
+    /* Prevent manual resizing */
+    overflow-y: auto;
+    /* Enable vertical scrolling */
+    max-height: 100px;
+    /* Roughly 4 lines */
+    min-height: 38px;
 }
 
 .chat-input button {
