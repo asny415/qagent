@@ -137,6 +137,7 @@ app.on("ready", () => {
     ipcMain.handle(
       key.replace(/([A-Z])/g, "-$1").toLowerCase(),
       async (event, args) => {
+        // eslint-disable-next-line import/namespace
         return await handlers[key](event, args, rightView);
       }
     );

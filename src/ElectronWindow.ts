@@ -76,6 +76,14 @@ export const send2Telegram = async (params): string => {
   }
 };
 
+export const send2Wechat = async (params): string => {
+  if (window.myAPI && window.myAPI.send) {
+    return await window.myAPI.send("wechat-send", params);
+  } else {
+    console.error("electronAPI.send is not available!");
+  }
+};
+
 export const pageDown = async () => {
   if (window.myAPI && window.myAPI.send) {
     await window.myAPI.send("next-page");
