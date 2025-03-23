@@ -37,6 +37,7 @@
     "@vitejs/plugin-vue": "^5.2.2",
     "browser-level": "^2.0.0",
     "classic-level": "^2.0.0",
+    "cron-parser": "^5.0.6",
     "dotenv": "^16.4.7",
     "electron-squirrel-startup": "^1.0.1",
     "events": "^3.3.0",

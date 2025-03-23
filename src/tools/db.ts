@@ -22,3 +22,27 @@ export const dbGet: TOOL_FUNCTION = async (args) => {
   const { key } = args;
   return await db.get(key);
 };
+
+export const listPrefix_doc: DOC = [
+  "数据库操作，列举所有以prefix开头的键值对",
+  [["prefix", "string", "前缀"]],
+];
+export const listPrefix: TOOL_FUNCTION = async (args) => {
+  const kvs = [];
+  const prefix = args.prefix;
+
+  // 创建范围查询流：gte >= prefix, lt < prefix + '\xff'
+  const stream = db.iterator({
+    gt: prefix,
+    lt: prefix + "\xff", // \xff 确保范围不超过prefix的扩展
+    keys: true, // 返回 keys
+    values: true, // 不需要返回值
+  });
+
+  // 流数据事件处理
+  for await (const data of stream) {
+    kvs.push(data);
+  }
+
+  return kvs;
+};

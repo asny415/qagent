@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import "./index.css";
+import "./cron";
 
 if (window.myAPI) {
   window.myAPI.on("set-left-view-bounds", (event, bounds) => {
