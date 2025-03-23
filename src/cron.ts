@@ -1,6 +1,7 @@
 import { CronExpressionParser } from "cron-parser";
 import { listPrefix, dbGet, dbPut } from "./tools/db";
 import { AIAgent } from "./QAgent";
+import { log } from "./ElectronWindow";
 
 const agent = new AIAgent();
 
@@ -34,7 +35,7 @@ setInterval(async () => {
         //运行任务
         await agent.task(text, async (type, msg, role, done) => {
           if (done) {
-            await dbPut(`progress-${taskkey}-${step++}`, msg);
+            log(`progress-${taskkey}-${step++}`, msg);
           }
         });
         await dbPut(taskkey, "success");

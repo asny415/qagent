@@ -48,7 +48,7 @@ import convert from "telegramify-markdown";
 import { ref, onMounted, nextTick, watch } from 'vue';
 import MarkdownIt from 'markdown-it';
 import { AIAgent } from './QAgent'
-import { pageDown, send2Telegram } from "./ElectronWindow.ts"
+import { log, pageDown, send2Telegram } from "./ElectronWindow.ts"
 interface Message {
     id: number;
     sender: 'user' | 'other';
@@ -164,6 +164,7 @@ const sendMessage = async () => {
                 }
                 //done参数代表单轮运行的结束
                 if (done) {
+                    log(task, msg)
                     messages.value.push({
                         id: nextMessageId.value++,
                         sender: role === 'user' ? 'user' : 'other',
