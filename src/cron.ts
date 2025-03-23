@@ -1,7 +1,7 @@
 import { CronExpressionParser } from "cron-parser";
 import { listPrefix, dbGet, dbPut } from "./tools/db";
 import { AIAgent } from "./QAgent";
-import { log } from "./ElectronWindow";
+import { getEnv, log } from "./ElectronWindow";
 
 const agent = new AIAgent();
 
