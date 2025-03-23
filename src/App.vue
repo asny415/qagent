@@ -35,7 +35,7 @@
             </div>
         </div>
         <div class="chat-input">
-            <textarea :disabled="running" v-model="newMessage" @keyup.enter="sendMessage"
+            <textarea :disabled="running" v-model="newMessage" @keyup="handleKeyUp"
                 placeholder="Type your message here..." ref="inputTextArea" rows="1"
                 @input="adjustTextAreaHeight"></textarea>
             <button :disabled="running" @click="sendMessage" :class="{ 'disabled-button': running }">Send</button>
@@ -56,6 +56,8 @@ interface Message {
     text: string;
     timestamp: string;
     type?: string;
+    token_i?: number;
+    token_o?: number;
 }
 
 const agent = new AIAgent()
@@ -72,6 +74,8 @@ const md = new MarkdownIt();
 const renderMarkdown = (text) => {
     return md.render(text);
 };
+//新增一个变量用来判断是否正在输入中文
+const isComposing = ref(false);
 
 window.myAPI.on("tg-text", async (event, text) => {
     if (running.value) {
@@ -200,9 +204,38 @@ const adjustTextAreaHeight = () => {
     }
 };
 
+// 新增的handleKeyUp方法
+const handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key === 'Enter') {
+        if (!isComposing.value) {
+            event.preventDefault(); // 阻止默认的换行行为
+            sendMessage();
+        }
+    }
+};
+
+// 监听compositionstart事件，表示开始输入中文
+const handleCompositionStart = () => {
+    console.log("输入法开始...")
+    isComposing.value = true;
+};
+
+// 监听compositionend事件，表示中文输入结束
+const handleCompositionEnd = () => {
+    setTimeout(() => {
+        console.log("输入法结束")
+        isComposing.value = false;
+    }, 300);
+};
+
 onMounted(() => {
     scrollToBottom();
     adjustTextAreaHeight();
+    // 添加compositionstart和compositionend事件监听器
+    if (inputTextArea.value) {
+        inputTextArea.value.addEventListener('compositionstart', handleCompositionStart);
+        inputTextArea.value.addEventListener('compositionend', handleCompositionEnd);
+    }
 });
 
 watch(newMessage, () => {
