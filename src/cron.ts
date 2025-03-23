@@ -49,6 +49,8 @@ async function singleTurn() {
   }
 }
 
-//每十分钟执行一次
-setInterval(singleTurn, 10 * 60 * 1000);
-singleTurn();
+if (process.env.QAGENT_START_CRON) {
+  //每十分钟执行一次
+  setInterval(singleTurn, 10 * 60 * 1000);
+  singleTurn();
+}
