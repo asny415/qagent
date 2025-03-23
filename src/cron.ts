@@ -49,8 +49,12 @@ async function singleTurn() {
   }
 }
 
-if (process.env.QAGENT_START_CRON) {
-  //每十分钟执行一次
-  setInterval(singleTurn, 10 * 60 * 1000);
-  singleTurn();
-}
+(async () => {
+  const cron = await getEnv("QAGENT_START_CRON");
+  if (cron) {
+    console.log("start cron ...");
+    //每十分钟执行一次
+    setInterval(singleTurn, 10 * 60 * 1000);
+    singleTurn();
+  }
+})();
