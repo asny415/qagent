@@ -5,8 +5,7 @@ import { log } from "./ElectronWindow";
 
 const agent = new AIAgent();
 
-//每十分钟执行一次
-setInterval(async () => {
+async function singleTurn() {
   const crontasks = await listPrefix({ prefix: "cron-" });
   console.log("开始检查定时任务", crontasks);
   const options = {
@@ -28,20 +27,28 @@ setInterval(async () => {
       const ts = interval.next().toString();
       const taskkey = `task-result-${key}-${ts}`;
       let step = 0;
-      console.log("new task", taskkey, text);
+      console.log("new task", { taskkey, text });
       //如果还没有任务成功
       const result = await dbGet({ key: taskkey });
       if (!result) {
         //运行任务
         await agent.task(text, async (type, msg, role, done) => {
           if (done) {
-            log(`progress-${taskkey}-${step++}`, msg);
+            log(`progress-${taskkey}-${step++}`, { msg });
+            console.log(msg);
           }
         });
         await dbPut({ key: taskkey, value: "success" });
+        console.log("任务标记为已完成");
+      } else {
+        console.log("任务已执行过");
       }
     } catch (err) {
       console.log("Error:", err.message);
     }
   }
-}, 10 * 60 * 1000);
+}
+
+//每十分钟执行一次
+setInterval(singleTurn, 10 * 60 * 1000);
+singleTurn();
