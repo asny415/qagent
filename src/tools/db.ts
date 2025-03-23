@@ -23,6 +23,16 @@ export const dbGet: TOOL_FUNCTION = async (args) => {
   return await db.get(key);
 };
 
+export const dbDel_doc: DOC = [
+  "数据库的del操作",
+  [["key", "string", "存储的键"]],
+];
+export const dbDel: TOOL_FUNCTION = async (args) => {
+  const { key } = args;
+  await db.del(key);
+  return "success";
+};
+
 export const listPrefix_doc: DOC = [
   "数据库操作，列举所有以prefix开头的键值对",
   [["prefix", "string", "前缀"]],
@@ -45,4 +55,11 @@ export const listPrefix: TOOL_FUNCTION = async (args) => {
   }
 
   return kvs;
+};
+
+window.qdb = {
+  dbGet,
+  dbPut,
+  dbDel,
+  listPrefix,
 };

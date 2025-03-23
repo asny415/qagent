@@ -84,7 +84,7 @@ const createWindow = () => {
     setViewsBounds(width, height);
   });
   // Open the DevTools for main window in the bottom.
-  // mainWindow.webContents.openDevTools({ mode: "bottom" });
+  mainWindow.webContents.openDevTools({ mode: "detach" });
   // rightView.webContents.openDevTools({ mode: "bottom" });
 };
 

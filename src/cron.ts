@@ -7,8 +7,8 @@ const agent = new AIAgent();
 
 //每十分钟执行一次
 setInterval(async () => {
-  console.log("开始检查定时任务");
-  const crontasks = await listPrefix("cron-");
+  const crontasks = await listPrefix({ prefix: "cron-" });
+  console.log("开始检查定时任务", crontasks);
   const options = {
     currentDate: new Date(
       Math.floor(new Date().getTime() / (24 * 3600 * 1000)) *
@@ -21,16 +21,16 @@ setInterval(async () => {
   for (const kv of crontasks) {
     const [key, task] = kv;
     const params = task.split(/[\s]+/);
-    const cron = params.slice(0, 5).join(" ");
-    const text = params.slice(5);
+    const cron = params.slice(0, 6).join(" ");
+    const text = params.slice(6)[0];
     try {
       const interval = CronExpressionParser.parse(cron, options);
       const ts = interval.next().toString();
       const taskkey = `task-result-${key}-${ts}`;
       let step = 0;
-      console.log("new task", taskkey);
+      console.log("new task", taskkey, text);
       //如果还没有任务成功
-      const result = await dbGet(taskkey);
+      const result = await dbGet({ key: taskkey });
       if (!result) {
         //运行任务
         await agent.task(text, async (type, msg, role, done) => {
@@ -38,7 +38,7 @@ setInterval(async () => {
             log(`progress-${taskkey}-${step++}`, msg);
           }
         });
-        await dbPut(taskkey, "success");
+        await dbPut({ key: taskkey, value: "success" });
       }
     } catch (err) {
       console.log("Error:", err.message);
