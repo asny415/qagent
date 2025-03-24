@@ -1,4 +1,10 @@
-import { loadUrl, captureScreen, pageDown, dumpFull } from "../ElectronWindow";
+import {
+  loadUrl,
+  captureScreen,
+  pageDown,
+  dumpFull,
+  queryText,
+} from "../ElectronWindow";
 import { descriptImage, DOC, TOOL_FUNCTION } from "./common";
 
 export const webOCR_doc: DOC = [
@@ -75,6 +81,27 @@ export const twitter: TOOL_FUNCTION = async (args) => {
   if (matchs && matchs.length) {
     return matchs
       .map((x) => `在 ${x[1]} 发表了 ${x[2]}，网址为 ${x[0]}`)
+      .join("\n");
+  }
+  return "没有找到任何内容";
+};
+
+export const financialjuiceLatest_doc: DOC = [
+  "返回 financialjuice.com 最新的新闻条目",
+  [["limit", "int", "限制返回内容的个数"]],
+];
+export const financialjuiceLatest: TOOL_FUNCTION = async (args) => {
+  const limit = args.limit + 1;
+  await loadUrl("https://www.financialjuice.com/home");
+  //等待5秒钟以确保内容加载完毕
+  await new Promise((r) => setTimeout(r, 5000));
+  const news = await queryText(".media-body .headline-title");
+  const times = await queryText(".media-body .time");
+  console.log("browser loaded", news.length, times.length, limit);
+  if (times.length >= news.length && news.length >= limit) {
+    return news
+      .slice(0, limit)
+      .map((item, idx) => `${times[idx]} ${item}`)
       .join("\n");
   }
   return "没有找到任何内容";

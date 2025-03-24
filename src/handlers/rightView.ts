@@ -86,6 +86,16 @@ export async function dumpFull(event, url, rightView) {
   return result;
 }
 
+export async function queryText(event, args, rightView) {
+  if (typeof args == "string") {
+    const result = await rightView.webContents.executeJavaScript(
+      `JSON.stringify([...document.querySelectorAll("${args}")].map(n=>n.textContent))`
+    );
+    return JSON.parse(result);
+  } else
+    return await Promise.all(args.map((s) => queryText(event, s, rightView)));
+}
+
 export async function dumpVisible(event, url, rightView) {
   const result = await rightView.webContents.executeJavaScript(`(()=>{
       

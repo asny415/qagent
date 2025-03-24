@@ -1,5 +1,6 @@
 import * as toolset from "./toolset";
 import { DOC, ProgressCB, toPyType } from "./common";
+import { log } from "../ElectronWindow";
 
 const tools = Object.keys(toolset)
   .filter((f) => !f.endsWith("_doc"))
@@ -28,10 +29,14 @@ export function toolsDoc(): string {
 
 //检查第一个匹配的函数，如果匹配则运行并返回结果，否则返回false
 export async function toolGo(rsp: string, cb: ProgressCB): string | boolean {
-  const toolcode_reg = /```tool_code\n(.*?)\n```/s;
+  const toolcode_reg = /```tool_code\n(?:print\()?(.*)(?:\))?\n```/s;
   if (rsp.match(toolcode_reg)) {
     cb("thinking");
-    const code = rsp.match(toolcode_reg)[1];
+    let code = rsp.match(toolcode_reg)[1];
+    if (code.endsWith("))")) {
+      code = code.slice(0, -1);
+    }
+    console.log("找到需要运行的代码:", code);
     for (const tool of tools) {
       const [module, fname] = tool;
       console.log("test tool", fname);
@@ -45,7 +50,7 @@ export async function toolGo(rsp: string, cb: ProgressCB): string | boolean {
       if (code.match(reg)) {
         const params = code.match(reg).slice(1, 1 + (args || []).length);
         console.log("need run code", code.match(reg), params);
-        return await module[fname](
+        const result = await module[fname](
           params.reduce((r, v, idx) => {
             let value = v;
             if (value.endsWith('"') || value.endsWith("'")) {
@@ -59,6 +64,11 @@ export async function toolGo(rsp: string, cb: ProgressCB): string | boolean {
           }, {}),
           cb
         );
+        log("tool code running", {
+          code,
+          result,
+        });
+        return result;
       }
     }
   }

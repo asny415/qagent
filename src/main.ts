@@ -57,13 +57,19 @@ const createWindow = () => {
   // Create the right-side BrowserView
   rightView = new BrowserView({
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      // preload: path.join(__dirname, "preload.js"),
       // contextIsolation:false,
-      nodeIntegration: true, // Enable node integration for IPC communication
-      contextIsolation: false, // Disable context isolation for simplicity in this example
+      nodeIntegration: false, // Enable node integration for IPC communication
+      contextIsolation: true, // Disable context isolation for simplicity in this example
     },
   });
   mainWindow.addBrowserView(rightView);
+
+  // Set the user agent for rightView to a Chrome user agent
+  rightView.webContents.setUserAgent(
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  );
+
   rightView.webContents.loadURL("https://www.google.com");
 
   // Monitor the dom-ready event for rightView
@@ -84,8 +90,8 @@ const createWindow = () => {
     setViewsBounds(width, height);
   });
   // Open the DevTools for main window in the bottom.
-  // mainWindow.webContents.openDevTools({ mode: "detach" });
-  // rightView.webContents.openDevTools({ mode: "bottom" });
+  mainWindow.webContents.openDevTools({ mode: "detach" });
+  // rightView.webContents.openDevTools({ mode: "detach" });
 };
 
 function setViewsBounds(windowWidth: number, windowHeight: number) {

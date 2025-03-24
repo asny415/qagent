@@ -164,7 +164,7 @@ const sendMessage = async () => {
                 }
                 //done参数代表单轮运行的结束
                 if (done) {
-                    log(task, msg)
+                    log(task, { msg })
                     messages.value.push({
                         id: nextMessageId.value++,
                         sender: role === 'user' ? 'user' : 'other',
