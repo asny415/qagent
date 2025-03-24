@@ -9,9 +9,7 @@ async function singleTurn() {
   const crontasks = await listPrefix({ prefix: "cron-" });
   const options = {
     currentDate: new Date(
-      Math.floor(new Date().getTime() / (24 * 3600 * 1000)) *
-        (24 * 3600 * 1000) +
-        8 * 3600 * 1000
+      Math.floor(new Date().getTime() / (24 * 3600 * 1000)) * (24 * 3600 * 1000)
     ).toISOString(),
     endDate: new Date(new Date().getTime() + 10 * 60 * 1000).toISOString(),
     tz: "Asia/Shanghai",
