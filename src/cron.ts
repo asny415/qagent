@@ -16,6 +16,7 @@ async function singleTurn() {
     endDate: new Date(new Date().getTime() + 10 * 60 * 1000).toISOString(),
     tz: "Asia/Shanghai",
   };
+  console.log("cron time options is", options);
   for (const kv of crontasks) {
     const [key, task] = kv;
     const params = task.split(/[\s]+/);
