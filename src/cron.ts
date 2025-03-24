@@ -7,7 +7,6 @@ const agent = new AIAgent();
 
 async function singleTurn() {
   const crontasks = await listPrefix({ prefix: "cron-" });
-  console.log("开始检查定时任务", crontasks);
   const options = {
     currentDate: new Date(
       Math.floor(new Date().getTime() / (24 * 3600 * 1000)) *
@@ -22,6 +21,7 @@ async function singleTurn() {
     const params = task.split(/[\s]+/);
     const cron = params.slice(0, 6).join(" ");
     const text = params.slice(6)[0];
+    console.log("开始检查定时任务", cron, text);
     try {
       const interval = CronExpressionParser.parse(cron, options);
       const ts = interval.next().toString();
