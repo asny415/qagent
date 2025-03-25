@@ -50,7 +50,7 @@ export const browseWeb: TOOL_FUNCTION = async (args) => {
   let url = args.url as string;
   console.log(`need browser url:${url}`);
   if (!url.startsWith("http")) {
-    url = `google.com/search?q=${url}`;
+    url = `https://google.com/search?q=${url}`;
   }
   await loadUrl(url);
   //等待5秒钟以确保内容加载完毕

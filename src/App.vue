@@ -112,26 +112,22 @@ window.myAPI.on("tg-text", async (event, text) => {
                         action: "typing"
                     }
                 })
-            } else if (done) {
-                send2Telegram({
-                    path: "/sendMessage",
-                    body: {
-                        text: convert(msg, "escape"),
-                        parse_mode: "MarkdownV2",
-                    }
-                })
-                progressMsgId = null
-                clearInterval(progressTimerId)
-            } else {
-                if (!progressMsgId) {
-                    const json = await send2Telegram({
-                        path: "/sendMessage",
+            } else if (done || type == "done") {
+                if (progressTimerId) {
+                    clearInterval(progressTimerId)
+                    send2Telegram({
+                        path: "/editMessageText",
                         body: {
+                            message_id: progressMsgId,
                             text: convert(msg, "escape"),
                             parse_mode: "MarkdownV2",
                         }
                     })
-                    progressMsgId = json.result.message_id
+                    progressMsgId = null
+                    progressTimerId = null
+                }
+            } else {
+                if (!progressTimerId) {
                     progressTimerId = setInterval(() => {
                         send2Telegram({
                             path: "/editMessageText",
@@ -141,7 +137,15 @@ window.myAPI.on("tg-text", async (event, text) => {
                                 parse_mode: "MarkdownV2",
                             }
                         })
-                    }, 5000);
+                    }, 3000);
+                    const json = await send2Telegram({
+                        path: "/sendMessage",
+                        body: {
+                            text: convert(msg, "escape"),
+                            parse_mode: "MarkdownV2",
+                        }
+                    })
+                    progressMsgId = json.result.message_id
                 } else {
                     progressMsg = msg
                 }
