@@ -12,6 +12,131 @@ export const flux_doc: DOC = [
 
 export const flux: TOOL_FUNCTION = async (args) => {
   const { prompt, width, height } = args;
+  const _prompt = {
+    "3": {
+      inputs: {
+        seed: 446925415726742,
+        steps: 25,
+        cfg: 1,
+        sampler_name: "euler",
+        scheduler: "normal",
+        denoise: 0.9600000000000002,
+        model: ["10", 0],
+        positive: ["19", 0],
+        negative: ["7", 0],
+        latent_image: ["5", 0],
+      },
+      class_type: "KSampler",
+      _meta: {
+        title: "K采样器",
+      },
+    },
+    "5": {
+      inputs: {
+        width,
+        height,
+        batch_size: 1,
+      },
+      class_type: "EmptyLatentImage",
+      _meta: {
+        title: "空Latent图像",
+      },
+    },
+    "6": {
+      inputs: {
+        text: prompt,
+        clip: ["18", 0],
+      },
+      class_type: "CLIPTextEncode",
+      _meta: {
+        title: "CLIP文本编码",
+      },
+    },
+    "7": {
+      inputs: {
+        text: "(ugly, deformed, mutated, disfigured:1.3), (realistic humans, people:1.2), (simple background, plain background:1.0), (low quality, \nblurry, pixelated:1.3), (text, watermark, signature:1.2), (cartoon, anime:1.0)",
+        clip: ["18", 0],
+      },
+      class_type: "CLIPTextEncode",
+      _meta: {
+        title: "CLIP文本编码",
+      },
+    },
+    "8": {
+      inputs: {
+        samples: ["3", 0],
+        vae: ["11", 0],
+      },
+      class_type: "VAEDecode",
+      _meta: {
+        title: "VAE解码",
+      },
+    },
+    "10": {
+      inputs: {
+        unet_name: "Flux1-Dev-DedistilledMixTuned-v3-Q8_0.gguf",
+      },
+      class_type: "UnetLoaderGGUF",
+      _meta: {
+        title: "Unet Loader (GGUF)",
+      },
+    },
+    "11": {
+      inputs: {
+        vae_name: "ae.safetensors",
+      },
+      class_type: "VAELoader",
+      _meta: {
+        title: "加载VAE",
+      },
+    },
+    "14": {
+      inputs: {
+        images: ["20", 0],
+      },
+      class_type: "PreviewImage",
+      _meta: {
+        title: "预览图像",
+      },
+    },
+    "18": {
+      inputs: {
+        clip_name1: "t5/t5xxl_fp8_e4m3fn.safetensors",
+        clip_name2: "clip_l.safetensors",
+        type: "flux",
+        device: "default",
+      },
+      class_type: "DualCLIPLoader",
+      _meta: {
+        title: "双CLIP加载器",
+      },
+    },
+    "19": {
+      inputs: {
+        value: ["6", 0],
+      },
+      class_type: "UnloadAllModels",
+      _meta: {
+        title: "UnloadAllModels",
+      },
+    },
+    "20": {
+      inputs: {
+        value: ["8", 0],
+      },
+      class_type: "UnloadAllModels",
+      _meta: {
+        title: "UnloadAllModels",
+      },
+    },
+  };
+  const url = await comfyui({
+    prompt: _prompt,
+    path: "14.images.0",
+  });
+  console.log("need generate image", prompt, width, height, url);
+  await loadUrl(url);
+  return url;
 };
 
 export const iNiverseMix_doc: DOC = [
