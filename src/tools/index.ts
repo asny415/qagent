@@ -42,7 +42,13 @@ export async function toolGo(rsp: string, cb: ProgressCB): string | boolean {
       console.log("test tool", fname);
       const args = (module[`${fname}_doc`] as DOC)[1];
       const argsReg = (args || [])
-        .map((arg) => `(?:${arg[0]}=)?['"]?(.*)['"]?`)
+        .map(
+          (
+            arg,
+            idx //如果前面的参数都不要太饥饿，最后一个参数可以饥饿一点，所以只有一个字符串且放到最后
+          ) =>
+            `(?:${arg[0]}=)?['"]?(.*${idx < args.length - 1 ? "?" : ""})['"]?`
+        )
         .join("\\s*,\\s*");
       const funcreg = `^${fname}\\(${argsReg}\\)`;
       console.log(funcreg);

@@ -18,7 +18,9 @@ export async function telegramSend(event, params) {
       // Download the image and add it as a file
       const response = await fetch(body[key]);
       if (!response.ok) {
-        throw new Error(`Failed to download image: ${response.statusText}`);
+        throw new Error(
+          `Failed to download image "${body[key]}": ${response.statusText}`
+        );
       }
       const arrayBuffer = await response.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
