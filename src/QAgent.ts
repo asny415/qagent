@@ -21,7 +21,7 @@ export class AIAgent {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gemma3:27b",
+        model: "gemma3:12b",
         messages: this.msgBuffer,
         stream: true,
       }),

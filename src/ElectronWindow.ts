@@ -23,7 +23,7 @@ function invoke(channel: string) {
 
 export const loadUrl = invoke("change-url");
 export const getEnv = invoke("get-env");
-export const iNiverseMixInNode = invoke("i-niverse-mix");
+export const comfyui = invoke("comfyui");
 export const fetchImageToDataUri = invoke("fetch-image-to-data-uri");
 export const captureScreen = invoke("capture-right-view");
 export const dumpVisible = invoke("dump-visible");
