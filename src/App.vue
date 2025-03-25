@@ -104,7 +104,7 @@ window.myAPI.on("tg-text", async (event, text) => {
     let progressMsg = ""
     let progressTimerId = null
     try {
-        await agent.task(text, (type, msg = "", role = "agent", done = false) => {
+        await agent.task(text, async (type, msg = "", role = "agent", done = false) => {
             if (type == 'thinking') {
                 send2Telegram({
                     path: "/sendChatAction",
