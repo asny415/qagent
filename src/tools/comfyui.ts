@@ -4,9 +4,9 @@ import { DOC, getRandomInt, TOOL_FUNCTION } from "./common";
 export const flux_doc: DOC = [
   "使用flux模型进行文生图",
   [
-    ["prompt", "string", "prompt to generate image, only support english"],
     ["width", "int", "width of image"],
     ["height", "int", "height of image"],
+    ["prompt", "string", "prompt to generate image, only support english"],
   ],
 ];
 
@@ -142,9 +142,9 @@ export const flux: TOOL_FUNCTION = async (args) => {
 export const iNiverseMix_doc: DOC = [
   "使用iNiverseMix模型进行文生图，这个模型擅长亚洲国风少女的绘制",
   [
-    ["prompt", "string", "prompt to generate image, only support english"],
     ["width", "int", "width of image"],
     ["height", "int", "height of image"],
+    ["prompt", "string", "prompt to generate image, only support english"],
   ],
 ];
 
