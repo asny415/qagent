@@ -47,10 +47,10 @@ export const browseWeb_doc: DOC = [
   [["url", "string", "要浏览的网址"]],
 ];
 export const browseWeb: TOOL_FUNCTION = async (args) => {
-  const url = args.url as string;
+  let url = args.url as string;
   console.log(`need browser url:${url}`);
   if (!url.startsWith("http")) {
-    throw new Error("不正确的网址");
+    url = `google.com/search?q=${url}`;
   }
   await loadUrl(url);
   //等待5秒钟以确保内容加载完毕
