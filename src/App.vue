@@ -101,6 +101,8 @@ window.myAPI.on("tg-text", async (event, text) => {
     }
     running.value = true
     let progressMsgId = null
+    let progressMsg = ""
+    let progressTimerId = null
     try {
         await agent.task(text, (type, msg = "", role = "agent", done = false) => {
             if (type == 'thinking') {
@@ -119,6 +121,7 @@ window.myAPI.on("tg-text", async (event, text) => {
                     }
                 })
                 progressMsgId = null
+                clearInterval(progressTimerId)
             } else {
                 if (!progressMsgId) {
                     const json = await send2Telegram({
@@ -129,15 +132,18 @@ window.myAPI.on("tg-text", async (event, text) => {
                         }
                     })
                     progressMsgId = json.result.message_id
+                    progressTimerId = setInterval(() => {
+                        send2Telegram({
+                            path: "/editMessageText",
+                            body: {
+                                message_id: progressMsgId,
+                                text: convert(progressMsg, "escape"),
+                                parse_mode: "MarkdownV2",
+                            }
+                        })
+                    }, 5000);
                 } else {
-                    send2Telegram({
-                        path: "/editMessageText",
-                        body: {
-                            message_id: progressMsgId,
-                            text: convert(msg, "escape"),
-                            parse_mode: "MarkdownV2",
-                        }
-                    })
+                    progressMsg = msg
                 }
             }
         })
