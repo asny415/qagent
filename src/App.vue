@@ -100,6 +100,7 @@ window.myAPI.on("tg-text", async (event, text) => {
         return;
     }
     running.value = true
+    let progressMsgId = null
     try {
         await agent.task(text, (type, msg = "", role = "agent", done = false) => {
             if (type == 'thinking') {
@@ -117,6 +118,27 @@ window.myAPI.on("tg-text", async (event, text) => {
                         parse_mode: "MarkdownV2",
                     }
                 })
+                progressMsgId = null
+            } else {
+                if (!progressMsgId) {
+                    const json = await send2Telegram({
+                        path: "/sendMessage",
+                        body: {
+                            text: convert(msg, "escape"),
+                            parse_mode: "MarkdownV2",
+                        }
+                    })
+                    progressMsgId = json.result.message_id
+                } else {
+                    send2Telegram({
+                        path: "/editMessageText",
+                        body: {
+                            message_id: progressMsgId,
+                            text: convert(msg, "escape"),
+                            parse_mode: "MarkdownV2",
+                        }
+                    })
+                }
             }
         })
     } catch (err) {
