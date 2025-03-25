@@ -1,5 +1,5 @@
 import { comfyui, loadUrl } from "../ElectronWindow";
-import { DOC, TOOL_FUNCTION } from "./common";
+import { DOC, getRandomInt, TOOL_FUNCTION } from "./common";
 
 export const flux_doc: DOC = [
   "使用flux模型进行文生图",
@@ -15,7 +15,7 @@ export const flux: TOOL_FUNCTION = async (args) => {
   const _prompt = {
     "3": {
       inputs: {
-        seed: 446925415726742,
+        seed: getRandomInt(1000, 10000000000),
         steps: 25,
         cfg: 1,
         sampler_name: "euler",

@@ -44,11 +44,11 @@
 </template>
 
 <script setup lang="ts">
-import convert from "telegramify-markdown";
 import { ref, onMounted, nextTick, watch } from 'vue';
 import MarkdownIt from 'markdown-it';
 import { AIAgent } from './QAgent'
 import { log, pageDown, send2Telegram } from "./ElectronWindow.ts"
+import { renderMarkdown } from "./tools/common"
 interface Message {
     id: number;
     sender: 'user' | 'other';
@@ -70,10 +70,6 @@ const loading = ref(false)
 const running = ref(false)
 const chatHistory = ref<HTMLElement | null>(null);
 const inputTextArea = ref<HTMLTextAreaElement | null>(null);
-const md = new MarkdownIt();
-const renderMarkdown = (text) => {
-    return md.render(text);
-};
 //新增一个变量用来判断是否正在输入中文
 const isComposing = ref(false);
 
@@ -84,16 +80,16 @@ window.myAPI.on("tg-text", async (event, text) => {
             send2Telegram({
                 path: "/sendMessage",
                 body: {
-                    text: convert("canceling, please be patient", "escape"),
-                    parse_mode: "MarkdownV2",
+                    text: renderMarkdown("canceling, please be patient"),
+                    parse_mode: "HTML",
                 }
             })
         } else {
             send2Telegram({
                 path: "/sendMessage",
                 body: {
-                    text: convert("busy, send 'cancel' to cancel", "escape"),
-                    parse_mode: "MarkdownV2",
+                    text: renderMarkdown("busy, send 'cancel' to cancel"),
+                    parse_mode: "HTML",
                 }
             })
         }
@@ -119,8 +115,8 @@ window.myAPI.on("tg-text", async (event, text) => {
                         path: "/editMessageText",
                         body: {
                             message_id: progressMsgId,
-                            text: convert(msg, "escape"),
-                            parse_mode: "MarkdownV2",
+                            text: renderMarkdown(msg),
+                            parse_mode: "HTML",
                         }
                     })
                     progressMsgId = null
@@ -133,16 +129,16 @@ window.myAPI.on("tg-text", async (event, text) => {
                             path: "/editMessageText",
                             body: {
                                 message_id: progressMsgId,
-                                text: convert(progressMsg, "escape"),
-                                parse_mode: "MarkdownV2",
+                                text: renderMarkdown(progressMsg),
+                                parse_mode: "HTML",
                             }
                         })
                     }, 3000);
                     const json = await send2Telegram({
                         path: "/sendMessage",
                         body: {
-                            text: convert(msg, "escape"),
-                            parse_mode: "MarkdownV2",
+                            text: renderMarkdown(msg),
+                            parse_mode: "HTML",
                         }
                     })
                     progressMsgId = json.result.message_id
@@ -155,8 +151,8 @@ window.myAPI.on("tg-text", async (event, text) => {
         send2Telegram({
             path: "/sendMessage",
             body: {
-                text: convert(`Error:${err.message}`, "escape"),
-                parse_mode: "MarkdownV2",
+                text: renderMarkdown(`Error:${err.message}`),
+                parse_mode: "HTML",
             }
         })
     }

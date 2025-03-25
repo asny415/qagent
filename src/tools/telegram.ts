@@ -1,6 +1,5 @@
-import convert from "telegramify-markdown";
 import { send2Telegram } from "../ElectronWindow";
-import { DOC, TOOL_FUNCTION } from "./common";
+import { DOC, TOOL_FUNCTION, renderMarkdown } from "./common";
 
 export const sendText_doc: DOC = [
   "给我的telegram发送文本消息，只需要提供文本消息内容即可，不需要关心其他参数",
@@ -12,8 +11,8 @@ export const sendText: TOOL_FUNCTION = async (args) => {
   await send2Telegram({
     path: "/sendMessage",
     body: {
-      text: convert(text.replaceAll("\\n", "\n"), "escape"),
-      parse_mode: "MarkdownV2",
+      text: renderMarkdown(text),
+      parse_mode: "HTML",
     },
   });
 };
@@ -28,8 +27,8 @@ export const sendMarkdown: TOOL_FUNCTION = async (args) => {
   await send2Telegram({
     path: "/sendMessage",
     body: {
-      text: md,
-      parse_mode: "MarkdownV2",
+      text: renderMarkdown(md),
+      parse_mode: "HTML",
     },
   });
 };
@@ -54,7 +53,8 @@ export const sendMedia: TOOL_FUNCTION = async (args) => {
     path: "/sendPhoto",
     body: {
       type: "photo",
-      caption: convert(caption, "escape"),
+      caption: renderMarkdown(caption),
+      parse_mode: "HTML",
       photo: photo,
     },
   });

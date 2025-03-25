@@ -1,3 +1,4 @@
+import MarkdownIt from "markdown-it";
 import { nextTick } from "vue";
 import { dumpVisible } from "../ElectronWindow";
 export const API_BASE_URL = "http://192.168.3.227:11434/api";
@@ -20,6 +21,41 @@ export function toPyType(type: string) {
   return (
     { string: "str", number: "int", int: "int", boolean: "bool" }[type] || "str"
   );
+}
+
+const md = new MarkdownIt();
+const sanitizeHtml = (html) => {
+  const allowedTags = [
+    "b",
+    "i",
+    "u",
+    "s",
+    "del",
+    "span",
+    "a",
+    "code",
+    "pre",
+    "blockquote",
+  ];
+  return html.replace(
+    /<(\/)?(\w+)(\s*[^>]*)?>/g,
+    (match, closingSlash, tagName, attrs) => {
+      if (allowedTags.includes(tagName.toLowerCase())) {
+        return `<${closingSlash || ""}${tagName}${attrs || ""}>`;
+      }
+      return "";
+    }
+  );
+};
+export const renderMarkdown = (text) => {
+  const html = md.render(text);
+  return sanitizeHtml(html);
+};
+
+export function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 export async function descriptImage(image: string, cb: ProgressCB) {
