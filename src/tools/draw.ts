@@ -10,7 +10,7 @@ export const drawCard: TOOL_FUNCTION = async (args) => {
   const width = sizes.sort(() => Math.random() - 0.5)[0];
   const height = sizes.sort(() => Math.random() - 0.5)[0];
   const prompt = await getEnv("DRAW_CARD_PROMPT");
-  if (model == iniversemix) {
+  if (model == "iniversemix") {
     return await iNiverseMix({ prompt, width, height });
   }
   return await flux({ prompt, width, height });
