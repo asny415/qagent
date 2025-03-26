@@ -3,6 +3,14 @@ import { listPrefix, dbGet, dbPut } from "./tools/db";
 import { AIAgent } from "./QAgent";
 import { getEnv, log } from "./ElectronWindow";
 
+/**
+ * 
+ * 如何使用:
+ * 
+ * qdb.dbPut({key: "cron-elon",value:"0 0 20 * * * 请查看马斯克最近的推文，然后用中英双语的方式发送到我的微信，注明用户发推的时间"});
+ * 
+ */
+
 const agent = new AIAgent();
 
 async function singleTurn() {

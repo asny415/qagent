@@ -1,10 +1,4 @@
-import {
-  loadUrl,
-  captureScreen,
-  pageDown,
-  dumpFull,
-  queryText,
-} from "../ElectronWindow";
+import { loadUrl, captureScreen, pageDown, dumpFull } from "../ElectronWindow";
 import { descriptImage, DOC, TOOL_FUNCTION } from "./common";
 
 export const webOCR_doc: DOC = [
@@ -86,6 +80,7 @@ export const twitter: TOOL_FUNCTION = async (args) => {
   return "没有找到任何内容";
 };
 
+/*
 export const financialjuiceLatest_doc: DOC = [
   "返回 financialjuice.com 最新的新闻条目",
   [["limit", "int", "限制返回内容的个数"]],
@@ -106,3 +101,4 @@ export const financialjuiceLatest: TOOL_FUNCTION = async (args) => {
   }
   return "没有找到任何内容";
 };
+*/

@@ -92,7 +92,11 @@ export class AIAgent {
 ${doc}
 \`\`\`
 
-现在的时间是${new Date().toLocaleString()}, ${task}
+现在的时间是${new Date().toLocaleString()},用户希望你做的事情是："""
+${task}
+"""
+
+请你分析需要几个步骤来完成用户的任务，逐步执行并且在做每一步之前解释你在做的事情
 `,
       },
     ];
