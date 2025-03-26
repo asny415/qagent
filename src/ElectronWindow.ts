@@ -1,3 +1,4 @@
+import { generateUUID } from "./tools/common";
 // Interface for the exposed methods from preload.ts
 interface WindowWithElectron extends Window {
   myAPI: {
@@ -10,11 +11,28 @@ declare const window: WindowWithElectron;
 
 function invoke(channel: string) {
   return async function (...args: unknown) {
-    if (window.myAPI && window.myAPI.send) {
-      if (args.length == 1) {
-        return await window.myAPI.send(channel, args[0]);
+    const cb = args.pop();
+    if (typeof cb !== "function") {
+      args.push(cb);
+    }
+    const uuid = generateUUID();
+    console.log("add listenter", uuid);
+    window.myAPI.on(uuid, (event, params) => {
+      console.log("receive progress", params);
+      if (cb) {
+        cb(...params);
       }
-      return await window.myAPI.send(channel, args);
+    });
+    if (window.myAPI && window.myAPI.send) {
+      let result;
+      if (args.length == 1) {
+        result = await window.myAPI.send(channel, { uuid, args: args[0] });
+      } else {
+        result = await window.myAPI.send(channel, { uuid, args });
+      }
+      console.log("remove listenter", uuid);
+      window.myAPI.removeListener(uuid);
+      return result;
     } else {
       console.error("electronAPI.send is not available!");
     }

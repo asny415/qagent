@@ -12,7 +12,8 @@ function getValueByPath(obj, path) {
   }, obj);
 }
 
-export async function comfyui(event, args) {
+export async function comfyui(event, args, rv, cb) {
+  console.log("in comfyui function cb is", cb);
   const clientId = generateUUID();
   const { prompt, path } = args;
   const COMFYUI_URI = process.env["COMFYUI_URI"];
@@ -55,10 +56,15 @@ export async function comfyui(event, args) {
               r();
             } else {
               console.log(`正在执行节点: ${msg.data.node}`);
+              cb("handler", `正在执行节点: ${msg.data.node}`);
             }
             break;
           case "progress":
             console.log(
+              `进度: ${msg.data.value}/${msg.data.max} at node ${msg.data.node}`
+            );
+            cb(
+              "handler",
               `进度: ${msg.data.value}/${msg.data.max} at node ${msg.data.node}`
             );
             break;

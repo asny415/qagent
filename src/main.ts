@@ -142,9 +142,13 @@ app.on("ready", () => {
   Object.keys(handlers).forEach((key) => {
     ipcMain.handle(
       key.replace(/([A-Z])/g, "-$1").toLowerCase(),
-      async (event, args) => {
+      async (event, { uuid, args }) => {
         // eslint-disable-next-line import/namespace
-        return await handlers[key](event, args, rightView);
+        const cb = (type, msg) => {
+          console.log("send progress", uuid, type, msg);
+          mainWindow.webContents.send(uuid, [type, msg]);
+        };
+        return await handlers[key](event, args, rightView, cb);
       }
     );
   });

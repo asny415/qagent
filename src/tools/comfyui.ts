@@ -10,7 +10,7 @@ export const flux_doc: DOC = [
   ],
 ];
 
-export const flux: TOOL_FUNCTION = async (args) => {
+export const flux: TOOL_FUNCTION = async (args, cb) => {
   const { prompt, width, height } = args;
   const _prompt = {
     "3": {
@@ -130,10 +130,13 @@ export const flux: TOOL_FUNCTION = async (args) => {
       },
     },
   };
-  const url = await comfyui({
-    prompt: _prompt,
-    path: "14.images.0",
-  });
+  const url = await comfyui(
+    {
+      prompt: _prompt,
+      path: "14.images.0",
+    },
+    cb
+  );
   console.log("need generate image", prompt, width, height, url);
   await loadUrl(url);
   return url;
