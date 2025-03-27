@@ -2,8 +2,8 @@ import { send2Telegram } from "../ElectronWindow";
 import { DOC, TOOL_FUNCTION, renderMarkdown } from "./common";
 
 export const sendText_doc: DOC = [
-  "给我的telegram发送文本消息，只需要提供文本消息内容即可，不需要关心其他参数",
-  [["text", "string", "要发送的消息内容，支持多段文字"]],
+  "给我的telegram发送文本类型的消息",
+  [["text", "string", "要发送的消息内容，支持Markdown语法"]],
 ];
 
 export const sendText: TOOL_FUNCTION = async (args) => {
@@ -17,24 +17,8 @@ export const sendText: TOOL_FUNCTION = async (args) => {
   });
 };
 
-export const sendMarkdown_doc: DOC = [
-  "给我的telegram发送Markdown格式的消息，只需要提供文本消息内容即可，不需要关心其他参数",
-  [["md", "string", "要发送的Markdown格式的消息内容"]],
-];
-
-export const sendMarkdown: TOOL_FUNCTION = async (args) => {
-  const { md } = args;
-  await send2Telegram({
-    path: "/sendMessage",
-    body: {
-      text: renderMarkdown(md),
-      parse_mode: "HTML",
-    },
-  });
-};
-
-export const sendMedia_doc: DOC = [
-  "给telegram用户发送单张图片，需要提供图片和图片描述",
+export const sendPhoto_doc: DOC = [
+  "给我的telegram发送图片",
   [
     [
       "photo",
@@ -45,17 +29,43 @@ export const sendMedia_doc: DOC = [
   ],
 ];
 
-export const sendMedia: TOOL_FUNCTION = async (args) => {
+export const sendPhoto: TOOL_FUNCTION = async (args) => {
   const { caption, photo } = args;
   console.log(`send media: "${photo}" "${caption}" to telegram`);
 
   await send2Telegram({
     path: "/sendPhoto",
     body: {
-      type: "photo",
       caption: renderMarkdown(caption),
       parse_mode: "HTML",
-      photo: photo,
+      photo,
+    },
+  });
+};
+
+export const sendVideo_doc: DOC = [
+  "给我的telegram发送视频",
+  [
+    [
+      "video",
+      "string",
+      "要发送的视频，可以是本地文件路径，网络地址或者是data uri",
+    ],
+    ["caption", "string", "视频描述，支持Markdown语法"],
+  ],
+];
+
+export const sendVideo: TOOL_FUNCTION = async (args) => {
+  const { caption, video } = args;
+  console.log(`send media: "${video}" "${caption}" to telegram`);
+
+  await send2Telegram({
+    path: "/sendVideo",
+    body: {
+      caption: renderMarkdown(caption),
+      parse_mode: "HTML",
+      video,
+      supports_streaming: true,
     },
   });
 };

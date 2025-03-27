@@ -14,7 +14,10 @@ export async function telegramSend(event, params) {
 
   // Iterate through the body and append each key-value pair to formData
   for (const key in body) {
-    if (key === "photo" && body[key].startsWith("http://")) {
+    if (
+      (key === "photo" || key === "video") &&
+      body[key].startsWith("http://")
+    ) {
       // Download the image and add it as a file
       const response = await fetch(body[key]);
       if (!response.ok) {

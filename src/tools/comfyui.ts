@@ -1,6 +1,203 @@
 import { comfyui, loadUrl } from "../ElectronWindow";
 import { DOC, getRandomInt, TOOL_FUNCTION } from "./common";
 
+export const ltxvideo_doc: DOC = [
+  "使用ltxvideo模型通过文本生成视频",
+  [
+    ["width", "int", "width of video"],
+    ["height", "int", "height of video"],
+    ["duration", "int", "seconds of video"],
+    ["prompt", "string", "prompt to generate video, only support english"],
+  ],
+];
+
+export const ltxvideo: TOOL_FUNCTION = async (args, cb) => {
+  const { prompt, width, height, duration } = args;
+  const frame_rate = 25;
+  const _prompt = {
+    "8": {
+      inputs: {
+        samples: ["81", 0],
+        vae: ["44", 2],
+      },
+      class_type: "VAEDecode",
+      _meta: {
+        title: "VAE解码",
+      },
+    },
+    "38": {
+      inputs: {
+        clip_name: "t5/google_t5-v1_1-xxl_encoderonly-fp16.safetensors",
+        type: "ltxv",
+        device: "default",
+      },
+      class_type: "CLIPLoader",
+      _meta: {
+        title: "加载CLIP",
+      },
+    },
+    "44": {
+      inputs: {
+        ckpt_name: "LTXV/ltx-video-2b-v0.9.5.safetensors",
+      },
+      class_type: "CheckpointLoaderSimple",
+      _meta: {
+        title: "Checkpoint加载器（简易）",
+      },
+    },
+    "69": {
+      inputs: {
+        frame_rate,
+        positive: ["91", 0],
+        negative: ["90", 0],
+      },
+      class_type: "LTXVConditioning",
+      _meta: {
+        title: "LTXV条件",
+      },
+    },
+    "71": {
+      inputs: {
+        steps: 20,
+        max_shift: 2.05,
+        base_shift: 0.95,
+        stretch: true,
+        terminal: 0.1,
+        latent: ["84", 0],
+      },
+      class_type: "LTXVScheduler",
+      _meta: {
+        title: "LTXV调度器",
+      },
+    },
+    "73": {
+      inputs: {
+        sampler_name: "gradient_estimation",
+      },
+      class_type: "KSamplerSelect",
+      _meta: {
+        title: "K采样器选择",
+      },
+    },
+    "79": {
+      inputs: {
+        block_indices: "14",
+        model: ["44", 0],
+      },
+      class_type: "LTXVApplySTG",
+      _meta: {
+        title: "🅛🅣🅧 LTXV Apply STG",
+      },
+    },
+    "81": {
+      inputs: {
+        noise: ["83", 0],
+        guider: ["89", 0],
+        sampler: ["73", 0],
+        sigmas: ["71", 0],
+        latent_image: ["84", 0],
+      },
+      class_type: "SamplerCustomAdvanced",
+      _meta: {
+        title: "自定义采样器（高级）",
+      },
+    },
+    "82": {
+      inputs: {
+        cfg: 3,
+        stg: 1,
+        rescale: 0.75,
+        model: ["79", 0],
+        positive: ["69", 0],
+        negative: ["69", 1],
+      },
+      class_type: "STGGuider",
+      _meta: {
+        title: "🅛🅣🅧 STG Guider",
+      },
+    },
+    "83": {
+      inputs: {
+        noise_seed: 42,
+      },
+      class_type: "RandomNoise",
+      _meta: {
+        title: "随机噪波",
+      },
+    },
+    "84": {
+      inputs: {
+        width,
+        height,
+        length: duration * frame_rate,
+        batch_size: 1,
+      },
+      class_type: "EmptyLTXVLatentVideo",
+      _meta: {
+        title: "空Latent视频（LTXV）",
+      },
+    },
+    "88": {
+      inputs: {
+        frame_rate,
+        loop_count: 0,
+        filename_prefix: "ltxv",
+        format: "video/h264-mp4",
+        pix_fmt: "yuv420p",
+        crf: 19,
+        save_metadata: true,
+        trim_to_audio: false,
+        pingpong: false,
+        save_output: true,
+        images: ["8", 0],
+      },
+      class_type: "VHS_VideoCombine",
+      _meta: {
+        title: "Video Combine 🎥🅥🅗🅢",
+      },
+    },
+    "89": {
+      inputs: {
+        value: ["82", 0],
+      },
+      class_type: "UnloadAllModels",
+      _meta: {
+        title: "UnloadAllModels",
+      },
+    },
+    "90": {
+      inputs: {
+        text: "",
+        clip: ["38", 0],
+      },
+      class_type: "CLIPTextEncode",
+      _meta: {
+        title: "CLIP文本编码",
+      },
+    },
+    "91": {
+      inputs: {
+        text: prompt,
+        clip: ["38", 0],
+      },
+      class_type: "CLIPTextEncode",
+      _meta: {
+        title: "CLIP文本编码",
+      },
+    },
+  };
+  const url = await comfyui(
+    {
+      prompt: _prompt,
+      path: "88.gifs.0",
+    },
+    cb
+  );
+  console.log("need generate video", prompt, width, height, url);
+  await loadUrl(url);
+  return url;
+};
+
 export const flux_doc: DOC = [
   "使用flux模型进行文生图",
   [
@@ -133,7 +330,7 @@ export const flux: TOOL_FUNCTION = async (args, cb) => {
   const url = await comfyui(
     {
       prompt: _prompt,
-      path: "14.images.0",
+      path: "88.videos.0",
     },
     cb
   );
