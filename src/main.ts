@@ -19,7 +19,7 @@ if (require("electron-squirrel-startup")) {
 
 if (process.env.HTTPS_PROXY) {
   const proxyAgent = new ProxyAgent({
-    uri: process.env.https_proxy | process.env.socks_proxy,
+    uri: process.env.HTTPS_PROXY,
   });
   setGlobalDispatcher(proxyAgent);
 }
