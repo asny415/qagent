@@ -79,8 +79,8 @@ export async function comfyui(event, args, rv, cb) {
     const progressUrl = `${COMFYUI_URI}/history/${promptid}`;
     const rsp = await fetch(progressUrl);
     const json = await rsp.json();
-    console.log("result", JSON.stringify(json));
     const result = getValueByPath(json[promptid].outputs, path);
+    console.log("result", JSON.stringify(json), path, result);
     if (result) {
       const { filename, subfolder, type } = result;
       const imgurl = `${COMFYUI_URI}/view?filename=${filename}&subfolder=${

@@ -330,7 +330,7 @@ export const flux: TOOL_FUNCTION = async (args, cb) => {
   const url = await comfyui(
     {
       prompt: _prompt,
-      path: "88.videos.0",
+      path: "14.images.0",
     },
     cb
   );
