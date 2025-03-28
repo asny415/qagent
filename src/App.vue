@@ -148,6 +148,7 @@ window.myAPI.on("tg-text", async (event, text) => {
             }
         })
     } catch (err) {
+        clearInterval(progressTimerId)
         send2Telegram({
             path: "/sendMessage",
             body: {
