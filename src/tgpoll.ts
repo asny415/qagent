@@ -1,6 +1,6 @@
 let offset = 0;
 
-const TELEGRAM_API = `https://api.telegram.org/bot${process.env.TG_BOT_TOKEN}`;
+const TELEGRAM_API = process.env["TG_API"];
 async function getUpdates() {
   try {
     const response = await fetch(`${TELEGRAM_API}/getUpdates?offset=${offset}`);

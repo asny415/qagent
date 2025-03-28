@@ -5,9 +5,8 @@ import { tmpdir } from "os";
 export async function telegramSend(event, params) {
   const { body, path: apiPath } = params;
   console.log("telegram send", body, apiPath);
-  const BOT_TOKEN = process.env["TG_BOT_TOKEN"];
   const CHAT_ID = process.env["TG_BOT_CHATID"];
-  const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
+  const TELEGRAM_API = process.env["TG_API"];
 
   const formData = new FormData();
   formData.append("chat_id", CHAT_ID);
