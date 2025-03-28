@@ -39,6 +39,7 @@ export async function telegramSend(event, params) {
     }
   }
 
+  let error;
   for (let i = 0; i < 3; i++) {
     try {
       const rsp = await fetch(`${TELEGRAM_API}${apiPath}`, {
@@ -48,10 +49,12 @@ export async function telegramSend(event, params) {
 
       const json = await rsp.json();
       console.log(json);
-      return json;
+      return "发送成功";
     } catch (err) {
+      error = err;
       await new Promise((resolve) => setTimeout(resolve, 10000));
-      console.log(`retry ${i}`);
+      console.log(`retry ${i}`, err);
     }
+    return `发送失败:${error.message}`;
   }
 }
