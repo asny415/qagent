@@ -25,7 +25,7 @@ function invoke(channel: string) {
     });
     if (window.myAPI && window.myAPI.send) {
       let result;
-      if (args.length == 1) {
+      if (args.length == 1 && args.map) {
         result = await window.myAPI.send(channel, { uuid, args: args[0] });
       } else {
         result = await window.myAPI.send(channel, { uuid, args });
