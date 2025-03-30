@@ -194,7 +194,13 @@ export const ltxvideo: TOOL_FUNCTION = async (args, cb) => {
     cb
   );
   console.log("need generate video", prompt, width, height, url);
-  await loadUrl(url);
+  if (url.startsWith("http")) {
+    await loadUrl(url);
+    return {
+      type: "video",
+      url,
+    };
+  }
   return url;
 };
 
@@ -335,7 +341,13 @@ export const flux: TOOL_FUNCTION = async (args, cb) => {
     cb
   );
   console.log("need generate image", prompt, width, height, url);
-  await loadUrl(url);
+  if (url.startsWith("http")) {
+    await loadUrl(url);
+    return {
+      type: "photo",
+      url,
+    };
+  }
   return url;
 };
 
@@ -437,6 +449,12 @@ export const iNiverseMix: TOOL_FUNCTION = async (args) => {
     path: "10.images.0",
   });
   console.log("need generate image", prompt, width, height, url);
-  await loadUrl(url);
+  if (url.startsWith("http")) {
+    await loadUrl(url);
+    return {
+      type: "photo",
+      url,
+    };
+  }
   return url;
 };
