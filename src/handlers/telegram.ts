@@ -49,7 +49,7 @@ export async function telegramSend(event, params) {
 
       const json = await rsp.json();
       console.log(json);
-      return "发送成功";
+      return json;
     } catch (err) {
       error = err;
       await new Promise((resolve) => setTimeout(resolve, 10000));
