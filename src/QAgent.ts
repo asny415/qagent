@@ -108,9 +108,11 @@ ${task}
   async process_rsp(task: string, text: string, cb: ProgressCB) {
     const result = await toolGo(text, cb);
     if (result) {
+      const resultstr =
+        typeof result == "string" ? result : JSON.stringify(result);
       this.msgBuffer.push({
         role: "user",
-        content: `\`\`\`tool_output\n${result}\n\`\`\``,
+        content: `\`\`\`tool_output\n${resultstr}\n\`\`\``,
       });
       await this.taskRun(task, cb);
     }
