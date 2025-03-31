@@ -2,9 +2,13 @@ import fs from "fs";
 import path from "path";
 import { tmpdir } from "os";
 
+let lastMessage = "";
 export async function telegramSend(event, params) {
   const { body, path: apiPath } = params;
   console.log("telegram send", body, apiPath);
+  if (body.text && body.text == lastMessage) {
+    return;
+  }
   const CHAT_ID = process.env["TG_BOT_CHATID"];
   const TELEGRAM_API = process.env["TG_API"];
 
@@ -49,6 +53,9 @@ export async function telegramSend(event, params) {
 
       const json = await rsp.json();
       console.log(json);
+      if (body.text) {
+        lastMessage = body.text;
+      }
       return json;
     } catch (err) {
       error = err;
