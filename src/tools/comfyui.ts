@@ -207,14 +207,19 @@ export const ltxvideo: TOOL_FUNCTION = async (args, cb) => {
 export const flux_doc: DOC = [
   "使用flux模型进行文生图",
   [
-    ["width", "int", "width of image"],
-    ["height", "int", "height of image"],
+    [
+      "mode",
+      "int",
+      "1:代表横屏,长宽是1280x720， 2:代表竖屏,长宽是720x1280 3:代表长宽是1024x1024",
+    ],
     ["prompt", "string", "prompt to generate image, only support english"],
   ],
 ];
 
 export const flux: TOOL_FUNCTION = async (args, cb) => {
-  const { prompt, width, height } = args;
+  const { prompt, mode } = args;
+  const width = mode == 1 ? 1280 : mode == 2 ? 720 : 1024;
+  const height = mode == 1 ? 720 : mode == 2 ? 1280 : 1024;
   const _prompt = {
     "3": {
       inputs: {
