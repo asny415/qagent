@@ -366,7 +366,7 @@ export const iNiverseMix: TOOL_FUNCTION = async (args) => {
   const _prompt = {
     "3": {
       inputs: {
-        seed: 693312442446083,
+        seed: getRandomInt(1000, 10000000000),
         steps: 35,
         cfg: 8,
         sampler_name: "dpmpp_sde",
