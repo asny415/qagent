@@ -218,13 +218,13 @@ export const flux: TOOL_FUNCTION = async (args, cb) => {
   const _prompt = {
     "3": {
       inputs: {
-        seed: getRandomInt(1000, 10000000000),
+        seed: 941726467456126,
         steps: 25,
         cfg: 1,
         sampler_name: "euler",
         scheduler: "normal",
         denoise: 0.9600000000000002,
-        model: ["10", 0],
+        model: ["21", 0],
         positive: ["19", 0],
         negative: ["7", 0],
         latent_image: ["5", 0],
@@ -248,7 +248,7 @@ export const flux: TOOL_FUNCTION = async (args, cb) => {
     "6": {
       inputs: {
         text: prompt,
-        clip: ["18", 0],
+        clip: ["21", 1],
       },
       class_type: "CLIPTextEncode",
       _meta: {
@@ -258,7 +258,7 @@ export const flux: TOOL_FUNCTION = async (args, cb) => {
     "7": {
       inputs: {
         text: "(ugly, deformed, mutated, disfigured:1.3), (realistic humans, people:1.2), (simple background, plain background:1.0), (low quality, \nblurry, pixelated:1.3), (text, watermark, signature:1.2), (cartoon, anime:1.0)",
-        clip: ["18", 0],
+        clip: ["21", 1],
       },
       class_type: "CLIPTextEncode",
       _meta: {
@@ -330,6 +330,19 @@ export const flux: TOOL_FUNCTION = async (args, cb) => {
       class_type: "UnloadAllModels",
       _meta: {
         title: "UnloadAllModels",
+      },
+    },
+    "21": {
+      inputs: {
+        lora_name: "uncensored-v2.safetensors",
+        strength_model: 1,
+        strength_clip: 1,
+        model: ["10", 0],
+        clip: ["18", 0],
+      },
+      class_type: "LoraLoader",
+      _meta: {
+        title: "加载LoRA",
       },
     },
   };
